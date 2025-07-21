@@ -115,6 +115,11 @@
 				padding: 0 2px;
 				border-radius: 2px;
 			}
+			.search-result-item.touching {
+				background-color: #e6f3ff;
+				transform: scale(0.98);
+				transition: all 0.1s ease;
+			}
 		</style>
 	</head>
 	<body class="is-preload">
@@ -1001,15 +1006,118 @@
 					queryInput.addEventListener('keyup', performSearch);
 
 
-					// 點擊搜尋結果跳轉
-					$(document).on('click', '.search-result-item[data-target]', function() {
-						var target = $($(this).data('target'));
-						if (target.length) {
-							$('html, body').animate({
-								scrollTop: target.offset().top - 100
-							}, 1000);
-							resultsContainer.style.display = 'none';
+					// 點擊搜尋結果跳轉 - 增強版跨瀏覽器相容性
+					function handleSearchResultClick(element) {
+						var targetId = element.getAttribute('data-target');
+						if (!targetId) return;
+						
+						var target = document.querySelector(targetId);
+						if (!target) return;
+						
+						// 隱藏搜尋結果
+						resultsContainer.style.display = 'none';
+						
+						// 更精確的位置計算，考慮不同的佈局方式
+						function getElementTop(el) {
+							var rect = el.getBoundingClientRect();
+							var scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+							return rect.top + scrollTop;
 						}
+						
+						var targetTop = getElementTop(target) - 100;
+						
+						// Safari 和 iOS 專用處理
+						var isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+						var isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+						
+						if (isSafari || isIOS) {
+							// Safari/iOS 使用 jQuery 動畫效果更佳
+							if (typeof $ !== 'undefined') {
+								$('html, body').animate({
+									scrollTop: targetTop
+								}, 800, 'swing');
+							} else {
+								// 降級：使用 requestAnimationFrame 實現平滑滾動
+								smoothScrollTo(targetTop, 800);
+							}
+						} else if ('scrollBehavior' in document.documentElement.style) {
+							// 現代瀏覽器使用原生平滑滾動
+							window.scrollTo({
+								top: targetTop,
+								behavior: 'smooth'
+							});
+						} else {
+							// 舊版瀏覽器降級處理
+							if (typeof $ !== 'undefined') {
+								$('html, body').animate({
+									scrollTop: targetTop
+								}, 1000);
+							} else {
+								smoothScrollTo(targetTop, 800);
+							}
+						}
+					}
+					
+					// 自訂平滑滾動函數（用於不支援原生平滑滾動的瀏覽器）
+					function smoothScrollTo(targetTop, duration) {
+						var start = window.pageYOffset;
+						var distance = targetTop - start;
+						var startTime = null;
+						
+						function animation(currentTime) {
+							if (startTime === null) startTime = currentTime;
+							var timeElapsed = currentTime - startTime;
+							var run = easeInOutQuad(timeElapsed, start, distance, duration);
+							window.scrollTo(0, run);
+							if (timeElapsed < duration) requestAnimationFrame(animation);
+						}
+						
+						// 緩動函數
+						function easeInOutQuad(t, b, c, d) {
+							t /= d/2;
+							if (t < 1) return c/2*t*t + b;
+							t--;
+							return -c/2 * (t*(t-2) - 1) + b;
+						}
+						
+						requestAnimationFrame(animation);
+					}
+
+					// 改良的事件處理 - 避免重複觸發
+					var lastClickTime = 0;
+					function preventDuplicateEvents(callback) {
+						return function(e) {
+							var now = Date.now();
+							if (now - lastClickTime < 300) {
+								return; // 防止300ms內重複觸發
+							}
+							lastClickTime = now;
+							
+							e.preventDefault();
+							e.stopPropagation();
+							callback.call(this, e);
+						};
+	
+					}
+					
+					// 分別處理 click 和 touch 事件
+					$(document).on('click', '.search-result-item[data-target]', preventDuplicateEvents(function(e) {
+						handleSearchResultClick(this);
+					}));
+					
+					// 觸控設備專用處理
+					$(document).on('touchstart', '.search-result-item[data-target]', preventDuplicateEvents(function(e) {
+						// 添加視覺回饋
+						$(this).addClass('touching');
+						handleSearchResultClick(this);
+					}));
+					
+					// 觸控結束時移除視覺回饋
+					$(document).on('touchend', '.search-result-item[data-target]', function(e) {
+						var self = this;
+						setTimeout(function() {
+							$(self).removeClass('touching');
+						}, 200);
 					});
 
 					// 點擊其他地方隱藏搜尋結果
