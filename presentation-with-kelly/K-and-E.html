@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EZ老師的網站製作流程</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .card-shadow {
+            box-shadow: 8px 8px 0px #1f2937;
+        }
+        .card-hover:hover {
+            transform: translate(-2px, -2px);
+            box-shadow: 10px 10px 0px #1f2937;
+        }
+        .step-number-shadow {
+            box-shadow: 4px 4px 0px #1f2937;
+        }
+        
+        /* Welcome Animation Styles */
+        #welcome-overlay {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        
+        #welcome-overlay.fade-out {
+            animation: fadeOut 1s ease-in-out forwards;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+        
+        @keyframes fadeOut {
+            from {
+                opacity: 1;
+            }
+            to {
+                opacity: 0;
+            }
+        }
+        
+        /* Main content entrance animation */
+        .main-content-enter {
+            animation: slideInUp 0.8s ease-out;
+        }
+        
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* Play button styles */
+        .play-button {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255, 255, 255, 0.9);
+            border: none;
+            border-radius: 50%;
+            width: 80px;
+            height: 80px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: #333;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            z-index: 10;
+        }
+        
+        .play-button:hover {
+            transform: translate(-50%, -50%) scale(1.1);
+            background: rgba(255, 255, 255, 1);
+        }
+        
+        .play-button:active {
+            transform: translate(-50%, -50%) scale(0.95);
+        }
+        
+        /* Play prompt styles */
+        .play-prompt {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-size: 14px;
+            z-index: 10;
+            animation: fadeInUp 0.5s ease-out;
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateX(-50%) translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+        }
+        
+        /* Skip button styles */
+        .skip-button {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            cursor: pointer;
+            z-index: 10;
+            transition: all 0.3s ease;
+        }
+        
+        .skip-button:hover {
+            background: rgba(0, 0, 0, 0.9);
+        }
+        
+        .skip-button:active {
+            transform: scale(0.95);
+        }
+        
+        /* Mobile specific styles */
+        @media (max-width: 768px) {
+            .play-button {
+                width: 60px;
+                height: 60px;
+                font-size: 20px;
+            }
+            
+            .play-prompt {
+                font-size: 12px;
+                padding: 8px 16px;
+                bottom: 80px;
+            }
+            
+            .skip-button {
+                top: 15px;
+                right: 15px;
+                padding: 6px 12px;
+                font-size: 11px;
+            }
+        }
+    </style>
+</head>
+<body class="min-h-screen font-sans" id="main-body">
+    <!-- Welcome Animation Overlay -->
+    <div id="welcome-overlay" class="fixed inset-0 z-50">
+        <video 
+            id="intro-video" 
+            class="w-full h-full object-cover"
+            muted 
+            autoplay
+            preload="auto">
+            <source src="Introduce.mp4" type="video/mp4">
+            <p class="text-gray-600 text-center mt-4">您的瀏覽器不支援影片播放。</p>
+        </video>
+        
+        <!-- Play button (hidden by default) -->
+        <button id="play-button" class="play-button" style="display: none;">
+            ▶️
+        </button>
+        
+        <!-- Play prompt (hidden by default) -->
+        <div id="play-prompt" class="play-prompt" style="display: none;">
+            👆 點擊播放鍵觀看介紹影片
+        </div>
+        
+        <!-- Skip button -->
+        <button id="skip-button" class="skip-button">
+            跳過 ⏭️
+        </button>
+    </div>
+
+    <!-- Main Container -->
+    <div class="max-w-4xl mx-auto px-4 py-8" id="main-container" style="display: none;">
+        <!-- Navigation -->
+        <div class="flex justify-end mb-6">
+            <div class="flex gap-4">
+                <!-- Kelly老師連結 -->
+                <div id="kelly-nav" class="relative">
+                    <!-- 將由JavaScript動態更新 -->
+                </div>
+                
+                <!-- EZ老師連結 -->
+                <div id="ez-nav" class="relative">
+                    <!-- 將由JavaScript動態更新 -->
+                </div>
+            </div>
+        </div>
+        
+        <!-- Cover Page -->
+        <div id="cover-page" class="content-section bg-white min-h-screen flex flex-col justify-center">
+            <!-- Cover Image -->
+            <div class="text-center mb-8">
+                <img src="frontpage.svg" alt="封面圖片" class="mx-auto max-w-5xl w-full h-auto">
+            </div>
+
+            <!-- Navigation Cards -->
+            <div class="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto mb-8">
+                <!-- Kelly老師卡片 -->
+                <div class="relative">
+                    <div class="w-full h-full absolute inset-0 bg-gray-900 rounded-xl translate-y-2 translate-x-2"></div>
+                    <div class="rounded-xl relative z-20 p-8 border-[3px] border-gray-900 bg-[#FCF3CF] card-hover transition-all duration-300 cursor-pointer" onclick="showPage('kelly')">
+                        <div class="text-center">
+                            <div class="text-4xl mb-4">🐰</div>
+                            <h2 class="text-2xl font-bold text-gray-900 mb-4">Kelly 老師</h2>
+                            <p class="text-gray-700 mb-6">AI 資訊連結與推薦資源</p>
+                            <div class="bg-white/50 rounded-lg p-3">
+                                <span class="text-gray-800 font-medium">點擊進入 →</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- EZ老師卡片 -->
+                <div class="relative">
+                    <div class="w-full h-full absolute inset-0 bg-gray-900 rounded-xl translate-y-2 translate-x-2"></div>
+                    <div class="rounded-xl relative z-20 p-8 border-[3px] border-gray-900 bg-[#E6F2FF] card-hover transition-all duration-300 cursor-pointer" onclick="showPage('ez')">
+                        <div class="text-center">
+                            <div class="text-4xl mb-4">🖥️</div>
+                            <h2 class="text-2xl font-bold text-gray-900 mb-4">EZ 老師</h2>
+                            <p class="text-gray-700 mb-6">網站製作流程與教學指南</p>
+                            <div class="bg-white/50 rounded-lg p-3">
+                                <span class="text-gray-800 font-medium">點擊進入 →</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Teacher Content Header (Hidden by default) -->
+        <div id="teacher-header" class="text-center mb-12 py-8 hidden">
+            <h1 class="text-4xl md:text-6xl font-bold tracking-tighter text-gray-900 mb-4">
+                🌐 EZ老師的網站製作流程
+            </h1>
+            <p class="text-gray-600 text-lg max-w-2xl mx-auto">
+                跟著這個簡單的流程，輕鬆創建屬於你的個人網站
+            </p>
+        </div>
+
+        <!-- Content Container -->
+        <div id="content-container">
+            <!-- EZ老師內容 -->
+            <div id="ez-teacher-content" class="content-section">
+                <!-- Flow Container -->
+                <div class="space-y-8">
+            <!-- Step 1 -->
+            <div class="relative">
+                <div class="w-full h-full absolute inset-0 bg-gray-900 rounded-xl translate-y-2 translate-x-2"></div>
+                <div class="rounded-xl relative z-20 p-8 border-[3px] border-gray-900 bg-white card-hover transition-all duration-300">
+                    <!-- Step Number -->
+                    <div class="absolute -top-6 left-8">
+                        <div class="w-12 h-12 bg-[#FCF3CF] border-[3px] border-gray-900 rounded-full flex items-center justify-center step-number-shadow">
+                            <span class="text-gray-900 font-bold text-lg">1</span>
+                        </div>
+                    </div>
+                    
+                    <div class="pt-4">
+                        <h2 class="text-2xl font-bold text-gray-900 mb-4">📝 規劃網站內容</h2>
+                        <p class="text-gray-700 text-lg mb-6">打開 Word 或記事本，擬定網站架構</p>
+                        
+                        <div class="space-y-3">
+                            <div class="bg-[#E6F2FF] border-l-4 border-[#4A90E2] p-4 rounded-r-lg">
+                                <span class="text-gray-800 font-medium">• 定義網站目的</span>
+                            </div>
+                            <div class="bg-[#E6F2FF] border-l-4 border-[#4A90E2] p-4 rounded-r-lg">
+                                <span class="text-gray-800 font-medium">• 整理重要內容(八九年級可以放假內容給七年級找)</span>
+                            </div>
+                            <div class="bg-[#E6F2FF] border-l-4 border-[#4A90E2] p-4 rounded-r-lg">
+                                <span class="text-gray-800 font-medium">• 規劃版面排版</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Arrow -->
+            <div class="text-center py-4">
+                <div class="text-4xl text-[#4A90E2]">↓</div>
+            </div>
+
+            <!-- Step 2 -->
+            <div class="relative">
+                <div class="w-full h-full absolute inset-0 bg-gray-900 rounded-xl translate-y-2 translate-x-2"></div>
+                <div class="rounded-xl relative z-20 p-8 border-[3px] border-gray-900 bg-white card-hover transition-all duration-300">
+                    <!-- Step Number -->
+                    <div class="absolute -top-6 left-8">
+                        <div class="w-12 h-12 bg-[#FCF3CF] border-[3px] border-gray-900 rounded-full flex items-center justify-center step-number-shadow">
+                            <span class="text-gray-900 font-bold text-lg">2</span>
+                        </div>
+                    </div>
+                    
+                    <div class="pt-4">
+                        <h2 class="text-2xl font-bold text-gray-900 mb-4">🎨 製作像素圖片</h2>
+                        <p class="text-gray-700 text-lg mb-6">使用像素創作網站製作圖片</p>
+                        
+                        <div class="space-y-3">
+                            <div class="bg-[#E6F2FF] border-l-4 border-[#4A90E2] p-4 rounded-r-lg">
+                                <span class="text-gray-800 font-medium">• 開啟
+                                <a href="https://ez1116.github.io/coding-note/Pixel_art_editor.html" 
+                                   class="text-[#4A90E2] hover:text-[#5A9BF5] transition-colors duration-200 underline" 
+                                   target="_blank">
+                                    像素圖片編輯器
+                                </a></span>
+                            </div>
+                            <div class="bg-[#E6F2FF] border-l-4 border-[#4A90E2] p-4 rounded-r-lg">
+                                <span class="text-gray-800 font-medium">• 自由創作或插入圖片微調</span>
+                            </div>
+                            <div class="bg-[#E6F2FF] border-l-4 border-[#4A90E2] p-4 rounded-r-lg">
+                                <span class="text-gray-800 font-medium">• 生成 HTML 程式碼</span>
+                            </div>
+                            <div class="bg-[#E6F2FF] border-l-4 border-[#4A90E2] p-4 rounded-r-lg">
+                                <span class="text-gray-800 font-medium">• 複製生成的 HTML 到記事本預備</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Arrow -->
+            <div class="text-center py-4">
+                <div class="text-4xl text-[#4A90E2]">↓</div>
+            </div>
+
+            <!-- Step 3 -->
+            <div class="relative">
+                <div class="w-full h-full absolute inset-0 bg-gray-900 rounded-xl translate-y-2 translate-x-2"></div>
+                <div class="rounded-xl relative z-20 p-8 border-[3px] border-gray-900 bg-white card-hover transition-all duration-300">
+                    <!-- Step Number -->
+                    <div class="absolute -top-6 left-8">
+                        <div class="w-12 h-12 bg-[#FCF3CF] border-[3px] border-gray-900 rounded-full flex items-center justify-center step-number-shadow">
+                            <span class="text-gray-900 font-bold text-lg">3</span>
+                        </div>
+                    </div>
+                    
+                    <div class="pt-4">
+                        <h2 class="text-2xl font-bold text-gray-900 mb-4">🤖 使用 Gemini 建立網站</h2>
+                        <p class="text-gray-700 text-lg mb-6">利用 Google Gemini 創建網站</p>
+                        
+                        <div class="space-y-3">
+                            <div class="bg-[#E6F2FF] border-l-4 border-[#4A90E2] p-4 rounded-r-lg">
+                                <span class="text-gray-800 font-medium">• 開啟
+                                <a href="https://gemini.google.com/app" 
+                                   class="text-[#4A90E2] hover:text-[#5A9BF5] transition-colors duration-200 underline" 
+                                   target="_blank">
+                                    Gemini
+                                </a></span>
+                            </div>
+                            <div class="bg-[#E6F2FF] border-l-4 border-[#4A90E2] p-4 rounded-r-lg">
+                                <span class="text-gray-800 font-medium">• 登入學校 Gmail 帳號</span>
+                            </div>
+                            <div class="bg-[#E6F2FF] border-l-4 border-[#4A90E2] p-4 rounded-r-lg">
+                                <span class="text-gray-800 font-medium">• 選取 2.5 Flash 模型（左上角 Gemini 字底下）</span>
+                            </div>
+                            <div class="bg-[#E6F2FF] border-l-4 border-[#4A90E2] p-4 rounded-r-lg">
+                                <span class="text-gray-800 font-medium">• 開啟對話窗的 </span>
+                                <span class="bg-gradient-to-r from-[#ffd89b] to-[#19547b] bg-clip-text text-transparent font-bold">Canvas 功能</span>
+                            </div>
+                            <div class="bg-[#E6F2FF] border-l-4 border-[#4A90E2] p-4 rounded-r-lg">
+                                <span class="text-gray-800 font-medium">• 告訴 Gemini 你想要創作的網站內容</span>
+                            </div>
+                            <div class="bg-[#E6F2FF] border-l-4 border-[#4A90E2] p-4 rounded-r-lg">
+                                <span class="text-gray-800 font-medium">• 將像素 HTML 貼上，告訴 Gemini 想插入這張像素圖片</span>
+                            </div>
+                            <div class="bg-[#E6F2FF] border-l-4 border-[#4A90E2] p-4 rounded-r-lg">
+                                <span class="text-gray-800 font-medium">• 與 Gemini 互動進行網站微調</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Arrow -->
+            <div class="text-center py-4">
+                <div class="text-4xl text-[#4A90E2]">↓</div>
+            </div>
+
+            <!-- Step 4 -->
+            <div class="relative">
+                <div class="w-full h-full absolute inset-0 bg-gray-900 rounded-xl translate-y-2 translate-x-2"></div>
+                <div class="rounded-xl relative z-20 p-8 border-[3px] border-gray-900 bg-white card-hover transition-all duration-300">
+                    <!-- Step Number -->
+                    <div class="absolute -top-6 left-8">
+                        <div class="w-12 h-12 bg-[#FCF3CF] border-[3px] border-gray-900 rounded-full flex items-center justify-center step-number-shadow">
+                            <span class="text-gray-900 font-bold text-lg">4</span>
+                        </div>
+                    </div>
+                    
+                    <div class="pt-4">
+                        <h2 class="text-2xl font-bold text-gray-900 mb-4">🚀 發佈網站</h2>
+                        <p class="text-gray-700 text-lg mb-6">完成網站並分享給他人</p>
+                        
+                        <div class="space-y-3">
+                            <div class="bg-[#E6F2FF] border-l-4 border-[#4A90E2] p-4 rounded-r-lg">
+                                <span class="text-gray-800 font-medium">• 點擊「共用」按鈕</span>
+                            </div>
+                            <div class="bg-[#E6F2FF] border-l-4 border-[#4A90E2] p-4 rounded-r-lg">
+                                <span class="text-gray-800 font-medium">• 選擇「分享 Canvas」</span>
+                            </div>
+                            <div class="bg-[#E6F2FF] border-l-4 border-[#4A90E2] p-4 rounded-r-lg">
+                                <span class="text-gray-800 font-medium">💡 提示：如果沒有看到分享選項，點開右上角人像旁邊的「這個對話中的檔案」</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+                </div>
+            </div>
+
+            <!-- Kelly老師內容 -->
+            <div id="kelly-teacher-content" class="content-section hidden">
+                <!-- Placeholder Card -->
+                <div class="relative mb-8">
+                    <div class="w-full h-full absolute inset-0 bg-gray-900 rounded-xl translate-y-2 translate-x-2"></div>
+                    <div class="rounded-xl relative z-20 p-8 border-[3px] border-gray-900 bg-white card-hover transition-all duration-300">
+                        <!-- Placeholder Number -->
+                        <div class="absolute -top-6 left-8">
+                            <div class="w-12 h-12 bg-[#FCF3CF] border-[3px] border-gray-900 rounded-full flex items-center justify-center step-number-shadow">
+                                <span class="text-gray-900 font-bold text-lg">🍄</span>
+                            </div>
+                        </div>
+                        
+                        <div class="pt-4">
+                            <h2 class="text-2xl font-bold text-gray-900 mb-4">香菇資料庫</h2>
+                            
+                            <div class="space-y-3">
+                                <div class="bg-[#E6F2FF] border-l-4 border-[#4A90E2] p-4 rounded-r-lg">
+                                    <span class="text-gray-800 font-medium">• 
+                                    <a href="https://teachablemachine.withgoogle.com/train/image" 
+                                       class="text-[#4A90E2] hover:text-[#5A9BF5] transition-colors duration-200 underline" 
+                                       target="_blank">
+                                        AI模型訓練平台
+                                    </a></span>
+                                </div>
+                                <div class="bg-[#E6F2FF] border-l-4 border-[#4A90E2] p-4 rounded-r-lg">
+                                    <span class="text-gray-800 font-medium">• 
+                                    <a href="https://drive.google.com/drive/folders/1q1npv_NU8YLCi8J27Hkvof6wLU147Fna?usp=sharing" 
+                                       class="text-[#4A90E2] hover:text-[#5A9BF5] transition-colors duration-200 underline" 
+                                       target="_blank">
+                                        有毒香菇資料
+                                    </a></span>
+                                </div>
+                                <div class="bg-[#E6F2FF] border-l-4 border-[#4A90E2] p-4 rounded-r-lg">
+                                    <span class="text-gray-800 font-medium">• 
+                                    <a href="https://drive.google.com/drive/folders/1drIuHmsULtghsT0q3J6J_2JbkjgFlU3Y?usp=sharing" 
+                                       class="text-[#4A90E2] hover:text-[#5A9BF5] transition-colors duration-200 underline" 
+                                       target="_blank">
+                                        無毒香菇資料
+                                    </a></span>
+                                </div>
+                                <div class="bg-[#E6F2FF] border-l-4 border-[#4A90E2] p-4 rounded-r-lg">
+                                    <span class="text-gray-800 font-medium">• 
+                                    <a href="https://drive.google.com/drive/folders/1E5ZazXca6Sifv9-tESON444s-8zmP9do?usp=sharing" 
+                                       class="text-[#4A90E2] hover:text-[#5A9BF5] transition-colors duration-200 underline" 
+                                       target="_blank">
+                                        測試集資料
+                                    </a></span>
+                                </div>
+                                <div class="bg-[#E6F2FF] border-l-4 border-[#4A90E2] p-4 rounded-r-lg">
+                                    <span class="text-gray-800 font-medium">• 
+                                    <a href="https://docs.google.com/document/d/1Dr3Lb3GOpEcyg_TB6ZeEbECIIMuF3ixnA_aSqROeu1w/edit?usp=sharing" 
+                                       class="text-[#4A90E2] hover:text-[#5A9BF5] transition-colors duration-200 underline" 
+                                       target="_blank">
+                                        香菇測試答案
+                                    </a></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="text-center mt-16 py-8">
+            <p id="footer-text" class="text-gray-600 text-sm">
+                ✨ 跟著這些步驟，你就能輕鬆創建自己的網站！
+            </p>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+        let currentPage = 'cover';
+        let introSkipped = false;
+        
+        // Welcome animation functions
+        function initWelcomeAnimation() {
+            // Check if user has already seen the intro in this session
+            const hasSeenIntro = sessionStorage.getItem('hasSeenIntro');
+            if (hasSeenIntro === 'true') {
+                // Skip intro immediately
+                document.getElementById('welcome-overlay').style.display = 'none';
+                document.getElementById('main-container').style.display = 'block';
+                initMainSite();
+                return;
+            }
+            
+            const video = document.getElementById('intro-video');
+            const playButton = document.getElementById('play-button');
+            const playPrompt = document.getElementById('play-prompt');
+            const skipButton = document.getElementById('skip-button');
+            
+            // Video event listeners
+            video.addEventListener('ended', function() {
+                setTimeout(hideWelcomeScreen, 500);
+            });
+            
+            video.addEventListener('error', function(e) {
+                console.error('Video error:', e);
+                // If video fails to load, auto-skip after 2 seconds
+                setTimeout(hideWelcomeScreen, 2000);
+            });
+            
+            // Skip button click handler
+            skipButton.addEventListener('click', function() {
+                hideWelcomeScreen();
+            });
+            
+            // Try to play the video automatically
+            const playPromise = video.play();
+            
+            if (playPromise !== undefined) {
+                playPromise.then(() => {
+                    // Auto-play succeeded, hide the play button
+                    playButton.style.display = 'none';
+                    playPrompt.style.display = 'none';
+                }).catch(error => {
+                    // Auto-play failed, show the play button
+                    console.log('Auto-play failed:', error);
+                    showPlayButton();
+                });
+            } else {
+                // Older browsers might not return a promise
+                setTimeout(() => {
+                    if (video.paused) {
+                        showPlayButton();
+                    }
+                }, 100);
+            }
+            
+            // Play button click handler
+            playButton.addEventListener('click', function() {
+                video.play();
+                playButton.style.display = 'none';
+                playPrompt.style.display = 'none';
+            });
+            
+            // Also allow clicking anywhere on the video to play
+            video.addEventListener('click', function() {
+                if (video.paused) {
+                    video.play();
+                    playButton.style.display = 'none';
+                    playPrompt.style.display = 'none';
+                }
+            });
+        }
+        
+        function showPlayButton() {
+            const playButton = document.getElementById('play-button');
+            const playPrompt = document.getElementById('play-prompt');
+            
+            playButton.style.display = 'flex';
+            playPrompt.style.display = 'block';
+        }
+        
+        function hideWelcomeScreen() {
+            const overlay = document.getElementById('welcome-overlay');
+            const mainContainer = document.getElementById('main-container');
+            
+            // Mark as seen in session storage
+            sessionStorage.setItem('hasSeenIntro', 'true');
+            
+            // Add fade-out animation
+            overlay.classList.add('fade-out');
+            
+            // Show and animate main content
+            if (mainContainer) {
+                mainContainer.style.display = 'block';
+                setTimeout(() => {
+                    mainContainer.classList.add('main-content-enter');
+                }, 50);
+            }
+            
+            // Remove overlay after animation
+            setTimeout(function() {
+                overlay.style.display = 'none';
+                // Initialize the main site
+                initMainSite();
+            }, 1000);
+        }
+        
+        // Initialize welcome animation on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            initWelcomeAnimation();
+        });
+
+        function showPage(page) {
+            // 頁面切換時滾動到頂部
+            window.scrollTo(0, 0);
+            
+            // 隱藏所有內容
+            document.getElementById('cover-page').classList.add('hidden');
+            document.getElementById('ez-teacher-content').classList.add('hidden');
+            document.getElementById('kelly-teacher-content').classList.add('hidden');
+            document.getElementById('teacher-header').classList.add('hidden');
+
+            // 重置所有導航按鈕
+            const kellyNav = document.getElementById('kelly-nav');
+            const ezNav = document.getElementById('ez-nav');
+
+            if (page === 'cover') {
+                // 顯示封面頁
+                document.getElementById('cover-page').classList.remove('hidden');
+                
+                // 隱藏導航按鈕
+                kellyNav.innerHTML = '';
+                ezNav.innerHTML = '';
+
+                // 設置純白背景
+                document.getElementById('main-body').className = 'min-h-screen font-sans bg-white';
+
+                // 更新頁面標題和footer
+                document.getElementById('footer-text').innerHTML = '🎓 選擇你想要學習的內容，開始探索吧！';
+                document.title = '學習資源中心';
+                
+            } else if (page === 'kelly') {
+                // 顯示Kelly老師內容
+                document.getElementById('kelly-teacher-content').classList.remove('hidden');
+                document.getElementById('teacher-header').classList.remove('hidden');
+                
+                // 恢復原背景
+                document.getElementById('main-body').className = 'bg-[#F8FAFF] min-h-screen font-sans';
+                
+                // 更新導航按鈕
+                kellyNav.innerHTML = `
+                    <div class="w-full h-full absolute inset-0 bg-gray-900 rounded-lg translate-y-1 translate-x-1"></div>
+                    <div class="relative z-20 px-6 py-3 border-[3px] border-gray-900 bg-[#FCF3CF] rounded-lg text-gray-900 font-medium">
+                        Kelly老師 ✓
+                    </div>
+                `;
+                ezNav.innerHTML = `
+                    <div class="w-full h-full absolute inset-0 bg-gray-900 rounded-lg translate-y-1 translate-x-1"></div>
+                    <a href="#" onclick="showPage('ez')" 
+                       class="relative z-20 block px-6 py-3 border-[3px] border-gray-900 bg-[#E6F2FF] rounded-lg text-gray-900 font-medium hover:-translate-y-px hover:-translate-x-px transition-all duration-200">
+                        EZ老師
+                    </a>
+                `;
+
+                // 更新頁面標題和footer
+                document.querySelector('#teacher-header h1').innerHTML = '🐰 Kelly老師的 AI 資訊連結';
+                document.querySelector('#teacher-header .text-gray-600').innerHTML = '這裡將放置Kelly老師提供的香菇辨識實作連結，包含AI模型與香菇資料';
+                document.getElementById('footer-text').innerHTML = '© 2025 黃怡寧 版權所有';
+                document.title = 'Kelly老師的網站連結';
+                
+            } else if (page === 'ez') {
+                // 顯示EZ老師內容
+                document.getElementById('ez-teacher-content').classList.remove('hidden');
+                document.getElementById('teacher-header').classList.remove('hidden');
+                
+                // 恢復原背景
+                document.getElementById('main-body').className = 'bg-[#F8FAFF] min-h-screen font-sans';
+                
+                // 更新導航按鈕
+                kellyNav.innerHTML = `
+                    <div class="w-full h-full absolute inset-0 bg-gray-900 rounded-lg translate-y-1 translate-x-1"></div>
+                    <a href="#" onclick="showPage('kelly')" 
+                       class="relative z-20 block px-6 py-3 border-[3px] border-gray-900 bg-[#FCF3CF] rounded-lg text-gray-900 font-medium hover:-translate-y-px hover:-translate-x-px transition-all duration-200">
+                        Kelly老師
+                    </a>
+                `;
+                ezNav.innerHTML = `
+                    <div class="w-full h-full absolute inset-0 bg-gray-900 rounded-lg translate-y-1 translate-x-1"></div>
+                    <div class="relative z-20 px-6 py-3 border-[3px] border-gray-900 bg-[#E6F2FF] rounded-lg text-gray-900 font-medium">
+                        EZ老師 ✓
+                    </div>
+                `;
+
+                // 更新頁面標題和footer
+                document.querySelector('#teacher-header h1').innerHTML = '🖥️ EZ老師的網站製作流程';
+                document.querySelector('#teacher-header .text-gray-600').innerHTML = '跟著這個簡單的流程，輕鬆創建屬於你的個人網站';
+                document.getElementById('footer-text').innerHTML = '© 2025 林易辰 版權所有';
+                document.title = 'EZ老師的網站製作流程';
+            }
+            
+            currentPage = page;
+        }
+
+        // 初始化頁面 - 這個函數現在由 welcome animation 控制
+        function initMainSite() {
+            showPage('cover');
+        }
+    </script>
+</body>
+</html>
