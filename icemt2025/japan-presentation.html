@@ -110,6 +110,11 @@
 				padding: 0 2px;
 				border-radius: 2px;
 			}
+			.main-highlight {
+				background-color: #ffdd00; /* A slightly different color for main content */
+				padding: 0 2px;
+				border-radius: 2px;
+			}
 		</style>
 	</head>
 	<body class="is-preload">
@@ -849,6 +854,48 @@
 			<script src="../editor-temp/assets/js/util.js"></script>
 			<script src="../editor-temp/assets/js/main.js"></script>
 			<script>
+				// Helper function to escape special characters for RegExp
+				function escapeRegExp(string) {
+					return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
+				}
+
+				function highlightInMainContent(query) {
+					// Clear previous highlights
+					var mainContent = document.getElementById('main');
+					var highlightedElements = mainContent.querySelectorAll('.main-highlight');
+					highlightedElements.forEach(function(el) {
+						var parent = el.parentNode;
+						parent.replaceChild(document.createTextNode(el.textContent), el);
+						parent.normalize(); // Merges adjacent text nodes
+					});
+
+					if (!query) return;
+
+					var escapedQuery = escapeRegExp(query);
+					var regex = new RegExp('(' + escapedQuery + ')', 'gi');
+					var sections = document.querySelectorAll('.slide-section');
+
+					sections.forEach(function(section) {
+						var walker = document.createTreeWalker(section, NodeFilter.SHOW_TEXT, null, false);
+						var node;
+						var nodesToReplace = [];
+
+						while (node = walker.nextNode()) {
+							if (node.parentNode.nodeName === 'SCRIPT' || node.parentNode.nodeName === 'STYLE') continue;
+							var matches = node.textContent.match(regex);
+							if (matches) {
+								nodesToReplace.push(node);
+							}
+						}
+
+						nodesToReplace.forEach(function(node) {
+							var newNode = document.createElement('span');
+							node.parentNode.replaceChild(newNode, node);
+							newNode.outerHTML = node.textContent.replace(regex, '<span class="main-highlight">' + escapedQuery + '</span>');
+						});
+					});
+				}
+
 				// 平滑滾動導航
 				$(document).ready(function() {
 					$('a[href^="#"]').on('click', function(e) {
@@ -876,7 +923,7 @@
 						{
 							id: 'introduction',
 							title: 'Introduction & Complex Systems',
-							content: 'introduction overview role complex systems K-12 science education NGSS Next Generation Science Standards benefited different teaching strategies student collaboration computer simulations conceptual scaffolding research gaps combined intervention limited effect existing scaffolding approaches addressing research gaps step by step manner exploring role different teaching strategies identifying students learning difficulties research goal contributing nuanced understanding various teaching strategies effectively foster students complex systems thinking hierarchical emergent Wilensky Resnick ontology Jacobson simulation Levy systematic review systems thinking Budak Ceyhan IJSE complex systems Yoon RER element agents components constituting action demonstrated relation different boundary adaptation manage adapt disruptions conditions feedback loops process output influences operation behavior interaction multiple relationships iteration processes happen iteratively randomness chance factors make unpredictable self-organization spontaneous mechanism results interactions gives rise various emergent patterns decentralized order no central controller dynamic process ongoing rather than static emergence phenomenon novel patterns emerged interactions self-organization equilibrium stable state results different systems mechanisms multiple levels combination structures mechanisms phenomena nonlinear effect effects may not proportional'
+							content: 'introduction overview role complex systems K-12 science education NGSS Next Generation Science Standards benefited different teaching strategies student collaboration computer simulations conceptual scaffolding research gaps combined intervention limited effect existing scaffolding approaches addressing research gaps step by step manner exploring role different teaching strategies identifying students learning difficulties research goal contributing nuanced understanding various teaching strategies effectively foster students complex systems thinking hierarchical emergent Wilensky Resnick ontology Jacobson simulation Levy systematic review systems thinking Budak Ceyhan IJSE complex systems Yoon RER element agents components constituting action demonstrated relation different boundary adaptation manage adapt disruptions conditions feedback loops process output influences operation behavior interaction multiple relationships iteration processes happen iteratively randomness chance factors make unpredictable self-organization spontaneous mechanism results interactions gives rise various emergent patterns decentralized order no central controller dynamic process ongoing rather than static emergence phenomenon novel patterns emerged interactions self-organization equilibrium stable state results different systems mechanisms multiple levels combination structures mechanisms phenomena nonlinear effect effects may not be proportional'
 						},
 						{
 							id: 'scaffolding',
@@ -900,30 +947,31 @@
 						}
 					];
 
-					$('#query').on('input', function() {
-						var query = $(this).val().trim().toLowerCase();
-						var resultsContainer = $('#search-results');
+					var queryInput = document.getElementById('query');
+					var resultsContainer = document.getElementById('search-results');
+
+					function performSearch() {
+						var query = queryInput.value.trim().toLowerCase();
+						highlightInMainContent(query);
 						
 						if (query.length === 0) {
-							resultsContainer.hide();
+							resultsContainer.style.display = 'none';
 							return;
 						}
 						
 						var results = [];
+						var escapedQuery = escapeRegExp(query);
+						var regex = new RegExp('(' + escapedQuery + ')', 'gi');
+
 						searchData.forEach(function(item) {
 							if (item.content.toLowerCase().includes(query)) {
-								// 提取匹配內容的片段
 								var content = item.content;
 								var index = content.toLowerCase().indexOf(query);
 								var start = Math.max(0, index - 30);
 								var end = Math.min(content.length, index + query.length + 30);
 								var snippet = content.substring(start, end);
 								
-								// 高亮匹配的文字
-								var highlightedSnippet = snippet.replace(
-									new RegExp('(' + query + ')', 'gi'),
-									'<span class="search-highlight">$1</span>'
-								);
+								var highlightedSnippet = snippet.replace(regex, '<span class="search-highlight">' + escapedQuery + '</span>');
 								
 								results.push({
 									id: item.id,
@@ -933,19 +981,25 @@
 							}
 						});
 						
+						var html = '';
 						if (results.length > 0) {
-							var html = '';
 							results.forEach(function(result) {
 								html += '<div class="search-result-item" data-target="#' + result.id + '">';
 								html += '<div class="search-result-title">' + result.title + '</div>';
 								html += '<div class="search-result-content">' + result.snippet + '</div>';
 								html += '</div>';
 							});
-							resultsContainer.html(html).show();
 						} else {
-							resultsContainer.html('<div class="search-result-item"><div class="search-result-content">No matching content found</div></div>').show();
+							html = '<div class="search-result-item"><div class="search-result-content">No matching content found</div></div>';
 						}
-					});
+						resultsContainer.innerHTML = html;
+						resultsContainer.style.display = 'block';
+					}
+
+					// Use 'input' for real-time feedback, and 'keyup' as a fallback.
+					queryInput.addEventListener('input', performSearch);
+					queryInput.addEventListener('keyup', performSearch);
+
 
 					// 點擊搜尋結果跳轉
 					$(document).on('click', '.search-result-item[data-target]', function() {
@@ -954,15 +1008,15 @@
 							$('html, body').animate({
 								scrollTop: target.offset().top - 100
 							}, 1000);
-							$('#search-results').hide();
-							$('#query').val('');
+							resultsContainer.style.display = 'none';
 						}
 					});
 
 					// 點擊其他地方隱藏搜尋結果
-					$(document).on('click', function(e) {
-						if (!$(e.target).closest('#search').length) {
-							$('#search-results').hide();
+					document.addEventListener('click', function(e) {
+						var searchSection = document.getElementById('search');
+						if (!searchSection.contains(e.target)) {
+							resultsContainer.style.display = 'none';
 						}
 					});
 				});
