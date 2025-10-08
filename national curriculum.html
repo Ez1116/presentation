@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Taiwan Science Curriculum Standards</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft JhengHei', sans-serif;
+            line-height: 1.8;
+            color: #2c3e50;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            background: white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        header {
+            background: white;
+            border-bottom: 3px solid #333;
+            padding: 50px 40px;
+        }
+        
+        header h1 {
+            font-size: 2.2em;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+        
+        header .subtitle {
+            font-size: 1.1em;
+            color: #666;
+            margin-top: 5px;
+        }
+        
+        .content {
+            padding: 50px 40px;
+        }
+        
+        .section {
+            margin-bottom: 60px;
+            padding-bottom: 40px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .section:last-child {
+            border-bottom: none;
+        }
+        
+        .section h2 {
+            font-size: 1.8em;
+            margin-bottom: 30px;
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+        
+        .subsection {
+            margin: 30px 0;
+        }
+        
+        .subsection h3 {
+            font-size: 1.4em;
+            margin-bottom: 20px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .subsection h4 {
+            font-size: 1.1em;
+            margin: 25px 0 15px 0;
+            font-weight: 600;
+            color: #444;
+        }
+        
+        .bilingual {
+            margin: 12px 0;
+            padding-left: 0;
+        }
+        
+        .en {
+            color: #2c3e50;
+            margin-bottom: 4px;
+            font-size: 1em;
+        }
+        
+        .zh {
+            color: #666;
+            font-size: 0.95em;
+            margin-top: 4px;
+        }
+        
+        .code-box {
+            display: inline-block;
+            background: #f8f8f8;
+            color: #333;
+            padding: 2px 8px;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+            font-size: 0.85em;
+            font-family: 'Courier New', monospace;
+            margin-right: 8px;
+        }
+        
+        .highlight {
+            background: linear-gradient(transparent 60%, #ffcccc 60%);
+            font-weight: 500;
+            padding: 0 2px;
+        }
+
+        .annotation {
+            color: #cc0000;
+            font-size: 0.9em;
+            display: block;
+            margin-top: 8px;
+            margin-left: 20px;
+            font-style: italic;
+        }
+        
+        .intro-text {
+            margin: 15px 0;
+            line-height: 1.9;
+        }
+        
+        .process-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 25px;
+            margin-top: 30px;
+        }
+        
+        .process-card {
+            background: white;
+            padding: 25px;
+            border: 1px solid #e0e0e0;
+        }
+        
+        .process-card h4 {
+            font-size: 1.15em;
+            margin-bottom: 18px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-top: 0;
+        }
+        
+        .process-card ul {
+            list-style: none;
+            padding-left: 0;
+        }
+        
+        .process-card li {
+            padding: 6px 0;
+            color: #444;
+            font-size: 0.95em;
+        }
+        
+        .process-card li strong {
+            color: #1a1a1a;
+            font-weight: 600;
+        }
+        
+        .process-card ul ul {
+            margin-top: 8px;
+            padding-left: 18px;
+        }
+        
+        .process-card ul ul li {
+            font-size: 0.9em;
+            color: #555;
+            padding: 4px 0;
+        }
+        
+        .process-card ul ul li:before {
+            content: "• ";
+            color: #999;
+            margin-right: 6px;
+        }
+        
+        footer {
+            background: #fafafa;
+            border-top: 1px solid #e0e0e0;
+            text-align: center;
+            padding: 30px;
+            color: #666;
+            font-size: 0.9em;
+        }
+        
+        footer p {
+            margin: 5px 0;
+        }
+        
+        @media (max-width: 768px) {
+            header {
+                padding: 30px 20px;
+            }
+            
+            header h1 {
+                font-size: 1.6em;
+            }
+            
+            .content {
+                padding: 30px 20px;
+            }
+            
+            .process-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Taiwan High School Science Curriculum Standards</h1>
+            <h1 style="font-size: 1.8em; margin-top: 8px;">台灣高中自然科學課程標準</h1>
+            <p class="subtitle">Nature of Science, Earth Science & Scientific Inquiry</p>
+            <p class="subtitle">科學本質、地球科學與科學探究</p>
+        </header>
+        
+        <div class="content">
+            <!-- Part 1: Nature of Science -->
+            <div class="section">
+                <h2>Part 1: Nature of Science 科學本質</h2>
+                
+                <div class="subsection">
+                    <h3>Scientific Attitudes and Nature 科學的態度與本質 (a)</h3>
+                    
+                    <h4>Cultivating Interest in Scientific Inquiry 培養科學探究的興趣 (i)</h4>
+                    
+                    <div class="bilingual">
+                        <p class="en"><span class="code-box">ai-Vc-1</span> Gaining a sense of achievement through successful problem-solving experiences.</p>
+                        <p class="zh">透過成功的問題解決經驗,獲得成就感。</p>
+                    </div>
+                    
+                    <div class="bilingual">
+                        <p class="en"><span class="code-box">ai-Vc-2</span> Developing new experiences and interests in everyday surroundings through scientific exploration and thinking.</p>
+                        <p class="zh">透過科學探索與科學思考對生活週遭的事物產生新的體驗及興趣。</p>
+                    </div>
+                    
+                    <div class="bilingual">
+                        <p class="en"><span class="code-box">ai-Vc-3</span> Appreciating the importance of science by recognizing that it is applied everywhere in daily life.</p>
+                        <p class="zh">體會生活中處處都會運用到科學,而能欣賞科學的重要性。</p>
+                    </div>
+                    
+                    <h4>Developing Habits of Scientific Thinking and Inquiry 養成應用科學思考與探究的習慣 (h)</h4>
+                    
+                    <div class="bilingual">
+                        <p class="en"><span class="code-box">ah-Vc-1</span> Understanding that scientific knowledge is one way people explain phenomena, but not the only explanation.</p>
+                        <p class="zh">了解科學知識是人們理解現象的一種解釋,但不是唯一的解釋。</p>
+                    </div>
+                    
+                    <div class="bilingual">
+                        <p class="en"><span class="code-box">ah-Vc-2</span> Maintaining a critical attitude toward scientific information obtained in daily life, carefully examining its authenticity and credibility.</p>
+                        <p class="zh">對日常生活中所獲得的科學資訊抱持批判的態度,審慎檢視其真實性與可信度。</p>
+                    </div>
+                    
+                    <h4>Understanding the Nature of Science 認識科學本質 (n)</h4>
+                    
+                    <div class="bilingual">
+                        <p class="en"><span class="code-box">an-Vc-1</span> Understanding that scientific inquiry employs <span class="highlight">multiple methods, tools, and techniques, using evidence from different perspectives</span> to support specific explanations and strengthen the validity of scientific arguments.
+                        <span class="annotation">→ Learners should develop an understanding of the crucial distinction between observation and inference.</span></p>
+                        <p class="zh">了解科學探究過程採用多種方法、工具和技術,經由不同面向的證據支持特定的解釋,以增強科學論點的有效性。</p>
+                    </div>
+                    
+                    <div class="bilingual">
+                        <p class="en"><span class="code-box">an-Vc-2</span> Understanding that scientific cognition <span class="highlight">emphasizes empirical evidence, logical reasoning, skepticism, and repeated verification</span>.
+                        <span class="annotation">→ Scientific knowledge is never absolute or certain. This knowledge is tentative and subject to change.</span></p>
+                        <p class="zh">了解科學的認知方式講求經驗證據性、合乎邏輯性、存疑和反覆檢視。</p>
+                    </div>
+                    
+                    <div class="bilingual">
+                        <p class="en"><span class="code-box">an-Vc-3</span> Recognizing that <span class="highlight">science helps humans create better living conditions, but cannot solve all problems in human society</span>. Technological development sometimes raises environmental or ethical issues.
+                        <span class="annotation">→ Science as a human enterprise is practiced in the context of a larger culture, and its practitioners (scientists) are the product of that culture.</span></p>
+                        <p class="zh">體認科學能幫助人類創造更好的生活條件,但並不能解決人類社會所有的問題,科技發展有時也會引起環境或倫理道德的議題。</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Part 2: Earth Science Knowledge -->
+            <div class="section">
+                <h2>Part 2: Earth Science Knowledge 地球科學知識</h2>
+                
+                <div class="subsection">
+                    <h3>The Dynamic Earth 變動的地球 (I)</h3>
+                    
+                    <h4>Surface and Crustal Changes 地表與地殼的變動 (Ia)</h4>
+                    
+                    <div class="bilingual">
+                        <p class="en"><span class="code-box">EIa-Vc-1</span> Scientists have proposed major theories such as <span class="highlight">continental drift</span>, <span class="highlight">seafloor spreading</span>, and <span class="highlight">plate tectonics</span> to explain the changing solid Earth.
+                        <span class="annotation">→ Science is tentative</span></p>
+                        <p class="zh">科學家曾經提出大陸漂移、海底擴張及板塊構造等主要學說,來解釋變動中的固體地球。</p>
+                    </div>
+                </div>
+                
+                <div class="subsection">
+                    <h3>Resources and Sustainable Development 資源與永續發展 (N)</h3>
+                    
+                    <h4>Sustainable Development and Resource Utilization 永續發展與資源的利用 (Na)</h4>
+                    
+                    <div class="bilingual">
+                        <p class="en"><span class="code-box">ENa-Vc-1</span> <span class="highlight">Sustainable development</span> is crucial for the continuation of Earth and humanity.
+                        <span class="annotation">→ Human enterprise with imagination and creativity</span></p>
+                        <p class="zh">永續發展對地球與人類的延續有其重要性。</p>
+                    </div>
+                    
+                    <div class="bilingual">
+                        <p class="en"><span class="code-box">ENa-Vc-2</span> Conserving resources and reasonable development can reduce human impact on the Earth's environment, facilitating sustainable development.</p>
+                        <p class="zh">節用資源與合理開發,可以降低人類對地球環境的影響,以利永續發展。</p>
+                    </div>
+                    
+                    <div class="bilingual">
+                        <p class="en"><span class="code-box">ENa-Vc-3</span> Understanding Earth's environment contributes to sustainable development in four dimensions: <span class="highlight">economic, ecological, cultural, and policy</span>.
+                        <span class="annotation">→ The context of larger cultures</span></p>
+                        <p class="zh">認識地球環境有助於經濟、生態、文化及政策四個面向的永續發展。</p>
+                    </div>
+                    
+                    <h4>Climate Change Impact and Adaptation 氣候變遷之影響與調適 (Nb)</h4>
+                                        
+                    <div class="bilingual">
+                        <p class="en"><span class="code-box">ENb-Vc-3</span> The principles that governed Earth's long-term natural climate changes in the past cannot fully explain the rapid climate change of recent decades. <span class="highlight">Current scientific evidence indicates that human activities are the primary factor.</span>
+                        <span class="annotation">→ The previous discussions that scientific knowledge is never absolute or certain</span></p>
+                        <p class="zh">過去主導地球長期的自然氣候變化的原理並無法完全用來解釋近幾十年來快速的氣候變遷情形。根據目前科學證據了解人類活動是主要因素。</p>
+                    </div>
+                    
+                    <div class="bilingual">
+                        <p class="en"><span class="code-box">ENb-Vc-4</span> Climate change adaptation has many dimensions and methods.</p>
+                        <p class="zh">因應氣候變遷的調適有許多面向與方法。</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Part 3: Scientific Inquiry and Practice -->
+            <div class="section">
+                <h2>Part 3: Scientific Inquiry and Practice 自然探究與實作</h2>
+                
+                <div class="subsection">
+                    <h3>Overview 概述</h3>
+                    <div class="intro-text">
+                        <p class="en">The <span class="highlight">"Scientific Inquiry and Practice"</span> course for general senior secondary schools is newly established mandatory domain content, accounting for <span class="highlight">one-third of the required credits</span> in the Natural Science domain, and can be implemented over two semesters. It aims to cultivate students' abilities to discover problems, understand problems, solve problems, draw conclusions, and express and communicate through hands-on processes, focusing on the material and living world.</p>
+                        <p class="zh">普通型高級中等學校「自然科學探究與實作」課程內容屬於新設必修領域課程內容,共佔自然科學領域部定必修學分數三分之一,可以分兩學期實施。旨在以實作的過程,針對物質與生命世界培養學生發現問題、認識問題、問題解決,以及提出結論與表達溝通之能力。</p>
+                    </div>
+                    
+                    <div class="intro-text" style="margin-top: 20px;">
+                        <p class="en">This course includes hands-on activities embodying the nature of inquiry, cross-disciplinary learning materials, diverse teaching methods, and assessment approaches, cultivating students' core competencies in <span class="highlight">independent action, expression, communicative interaction, and practical participation</span>.</p>
+                        <p class="zh">本課程內容含有探究本質的實作活動、跨科的學習素材、多元的教法與評量方式,培養學生自主行動、表達、溝通互動和實務參與之核心素養。</p>
+                    </div>
+                </div>
+                
+                <div class="subsection">
+                    <h3>Four Major Inquiry Processes 探究學習的四個主要歷程</h3>
+                    
+                    <div class="process-grid">
+                        <div class="process-card">
+                            <h4>◎ Discovering Problems<br>發現問題</h4>
+                            <ul>
+                                <li><strong><span class="highlight">Observing Phenomena</span> 觀察現象</strong>
+                                    <ul>
+                                        <li>Multi-faceted observation from daily experiences 從日常經驗進行多方觀察</li>
+                                        <li>Using senses or instruments to identify characteristics 運用感官或儀器辨識特性</li>
+                                        <li>Observing changes based on time or space 依據時空觀察變化</li>
+                                        <li><span class="highlight">Predicting possible causes</span> 推測可能成因</li>
+                                    </ul>
+                                </li>
+                                <li><strong>Collecting Information 蒐集資訊</strong>
+                                    <ul>
+                                        <li>Gathering information from various sources 利用多種來源蒐集資訊</li>
+                                        <li>Judging information reliability 判斷資訊可靠性</li>
+                                    </ul>
+                                </li>
+                                <li><strong>Formulating Problems 形成或訂定問題</strong>
+                                    <ul>
+                                        <li>Proposing questions suitable for scientific inquiry 提出適合科學探究的問題</li>
+                                    </ul>
+                                </li>
+                                <li><strong>Proposing Testable Perspectives 提出可驗證的觀點</strong>
+                                    <ul>
+                                        <li>Proposing <span class="highlight">hypotheses</span> or models 提出想法、假說或模型</li>
+                                    </ul>
+                                </li>
+                                <li style="list-style: none; margin-top: 15px;">
+                                    <span class="annotation">→ observation vs. prediction vs. hypothesis vs. inference</span>
+                                </li>
+                            </ul>
+                        </div>
+                        
+                        <div class="process-card">
+                            <h4>◎ Planning and Research<br>規劃與研究</h4>
+                            <ul>
+                                <li><strong>Identifying Variables 尋找變因或條件</strong>
+                                    <ul>
+                                        <li>Determining factors affecting research questions 判定相關的影響因素</li>
+                                        <li>Analyzing relationships between factors 分析因素間的關係</li>
+                                        <li>Reasonably predicting possible results 合理預測可能結果</li>
+                                    </ul>
+                                </li>
+                                <li><strong>Developing Research Plans 擬定研究計畫</strong>
+                                    <ul>
+                                        <li>Planning appropriate methods and procedures 計劃適當的方法與流程</li>
+                                        <li>Applying or assembling suitable instruments 應用或組裝合適器材</li>
+                                    </ul>
+                                </li>
+                                <li><strong>Collecting Data 收集資料數據</strong>
+                                    <ul>
+                                        <li>Operating equipment safely and correctly 正確且安全的操作器材</li>
+                                        <li>Designing appropriate recording formats 設計適當的紀錄格式</li>
+                                        <li>Systematically collecting data 有系統性的收集資料</li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </div>
+                        
+                        <div class="process-card">
+                            <h4>◎ Argumentation and Modeling<br>論證與建模</h4>
+                            <ul>
+                                <li><strong>Analyzing Data 分析資料和呈現證據</strong>
+                                    <ul>
+                                        <li>Organizing data effectively 有效整理資料數據</li>
+                                        <li>Creating charts and graphs 製作圖表</li>
+                                        <li>Identifying patterns and providing evidence 整理出規則,提出證據</li>
+                                    </ul>
+                                </li>
+                                <li><strong>Explanation and Reasoning 解釋和推理</strong>
+                                    <ul>
+                                        <li>Understanding meaning in data trends 看出數據蘊含的意義</li>
+                                        <li>Inferring causal relationships 推測因果關係</li>
+                                    </ul>
+                                </li>
+                                <li><strong>Drawing Conclusions 提出結論或解決方案</strong>
+                                    <ul>
+                                        <li>Forming arguments from explanations 形成論點</li>
+                                        <li>Proposing solutions based on evidence 依據證據提出解決方案</li>
+                                    </ul>
+                                </li>
+                                <li><strong>Building Models 建立模型</strong>
+                                    <ul>
+                                        <li>Building reasonable models to describe phenomena 建立模型描述現象</li>
+                                        <li>Recognizing model limitations 察覺模型的侷限性</li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </div>
+                        
+                        <div class="process-card">
+                            <h4>◎ Expression and Sharing<br>表達與分享</h4>
+                            <ul>
+                                <li><strong>Expression and Communication 表達與溝通</strong>
+                                    <ul>
+                                        <li>Using appropriate communication tools 適當利用多種表達方式</li>
+                                        <li>Correctly using scientific terminology 正確運用科學名詞、符號</li>
+                                        <li>Presenting inquiry results systematically 有條理陳述探究成果</li>
+                                    </ul>
+                                </li>
+                                <li><strong>Collaboration and Discussion 合作與討論</strong>
+                                    <ul>
+                                        <li>Listening to others' reports 傾聽他人的報告</li>
+                                        <li>Providing constructive feedback 提出具體意見或建議</li>
+                                        <li>Evaluating peers' inquiry processes 評估探究過程與結果</li>
+                                    </ul>
+                                </li>
+                                <li><strong>Evaluation and Reflection 評價與省思</strong>
+                                    <ul>
+                                        <li>Reflecting on applicability and limitations 反思應用性與限制性</li>
+                                        <li>Evaluating scientific information critically 審慎檢視真實性與可信度</li>
+                                        <li>Understanding the nature of scientific knowledge 了解科學知識的本質</li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>Taiwan General Senior Secondary School Natural Science Curriculum Standards</p>
+            <p>台灣普通型高級中等學校自然科學領域課程標準</p>
+            <p style="margin-top: 10px; opacity: 0.7;">Scientific Inquiry and Practice Course | 自然科學探究與實作課程</p>
+        </footer>
+    </div>
+</body>
+</html>
