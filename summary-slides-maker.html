@@ -1,0 +1,1487 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Summary Slides Maker</title>
+
+    <!-- External Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/marked@11.1.0/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.1/Sortable.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: #f5f7fa;
+            color: #2c3e50;
+            line-height: 1.6;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 2rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 0.95rem;
+        }
+
+        /* Main Container */
+        .container {
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 1.5rem;
+            padding: 1.5rem;
+            max-width: 1400px;
+            margin: 0 auto;
+            height: calc(100vh - 140px);
+        }
+
+        /* Left Panel - Slide List */
+        .slides-panel {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .panel-header {
+            background: #f8f9fa;
+            padding: 1rem 1.25rem;
+            border-bottom: 1px solid #e9ecef;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .panel-header h2 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .slide-count {
+            background: #1e3c72;
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .slides-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1rem;
+        }
+
+        .slide-item {
+            background: white;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+            cursor: move;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .slide-item:hover {
+            border-color: #1e3c72;
+            box-shadow: 0 4px 12px rgba(30, 60, 114, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .slide-item.active {
+            border-color: #1e3c72;
+            background: #f8f9ff;
+        }
+
+        .slide-number {
+            display: inline-block;
+            background: #1e3c72;
+            color: white;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 28px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .slide-item h3 {
+            font-size: 0.95rem;
+            color: #2c3e50;
+            margin-bottom: 0.5rem;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .slide-item p {
+            font-size: 0.85rem;
+            color: #6c757d;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .slide-actions {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            display: flex;
+            gap: 0.5rem;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+
+        .slide-item:hover .slide-actions {
+            opacity: 1;
+        }
+
+        .btn-icon {
+            background: white;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            width: 32px;
+            height: 32px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .btn-icon:hover {
+            background: #f8f9fa;
+            border-color: #1e3c72;
+        }
+
+        .btn-icon.delete:hover {
+            background: #dc3545;
+            border-color: #dc3545;
+            color: white;
+        }
+
+        /* Middle Panel - Editor */
+        .editor-panel {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .editor-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+        }
+
+        .form-group input[type="text"],
+        .form-group textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-family: inherit;
+            transition: border-color 0.2s ease;
+        }
+
+        .form-group input[type="text"]:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #1e3c72;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        .source-type-toggle {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .radio-option {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+        }
+
+        .radio-option input[type="radio"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .image-upload-area {
+            border: 2px dashed #dee2e6;
+            border-radius: 8px;
+            padding: 2rem;
+            text-align: center;
+            background: #f8f9fa;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .image-upload-area:hover {
+            border-color: #1e3c72;
+            background: #f8f9ff;
+        }
+
+        .image-upload-area.has-image {
+            padding: 1rem;
+            background: white;
+        }
+
+        .image-preview {
+            max-width: 100%;
+            max-height: 200px;
+            border-radius: 4px;
+            margin-bottom: 0.5rem;
+        }
+
+        #imageInput {
+            display: none;
+        }
+
+        .editor-actions {
+            padding: 1.5rem 2rem;
+            border-top: 1px solid #e9ecef;
+            background: #f8f9fa;
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: #1e3c72;
+            color: white;
+            flex: 1;
+        }
+
+        .btn-primary:hover {
+            background: #2a5298;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(30, 60, 114, 0.3);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #6c757d;
+            border: 2px solid #dee2e6;
+        }
+
+        .btn-secondary:hover {
+            background: #f8f9fa;
+            border-color: #1e3c72;
+            color: #1e3c72;
+        }
+
+        .btn-export {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-export:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 3rem 2rem;
+            color: #adb5bd;
+        }
+
+        .empty-state svg {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        .empty-state h3 {
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .empty-state p {
+            font-size: 0.9rem;
+        }
+
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e0;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #a0aec0;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .container {
+                grid-template-columns: 280px 1fr;
+            }
+        }
+
+        @media (max-width: 1024px) {
+            .container {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto 1fr;
+                height: auto;
+            }
+
+            .slides-panel {
+                max-height: 300px;
+            }
+        }
+
+        /* PDF Export Hidden Slides */
+        #pdfExportContainer {
+            position: fixed;
+            left: -9999px;
+            top: 0;
+        }
+
+        .pdf-slide {
+            width: 1920px;
+            height: 1080px;
+            background: white;
+            padding: 80px;
+            box-sizing: border-box;
+            page-break-after: always;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .pdf-slide .slide-question {
+            font-size: 3.5rem;
+            margin-bottom: 3rem;
+            color: #dc3545;
+            text-align: left;
+            font-weight: 700;
+        }
+
+        .pdf-slide .slide-answer {
+            font-size: 2.5rem;
+            line-height: 1.6;
+            margin-bottom: 3rem;
+            text-align: left;
+        }
+
+        .pdf-slide .slide-source {
+            font-size: 2rem;
+            border-top: 4px solid #e9ecef;
+            padding-top: 2rem;
+        }
+
+        .pdf-slide .slide-source-image {
+            max-height: 400px;
+            margin-top: 1rem;
+        }
+
+        /* Layout Settings Panel */
+        .layout-settings {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .layout-settings-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .layout-settings-header h3 {
+            font-size: 0.95rem;
+            color: #2c3e50;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .layout-settings-toggle {
+            font-size: 0.75rem;
+            color: #6c757d;
+        }
+
+        .layout-settings-content {
+            display: none;
+        }
+
+        .layout-settings-content.expanded {
+            display: block;
+        }
+
+        .slider-group {
+            margin-bottom: 1rem;
+        }
+
+        .slider-group label {
+            display: block;
+            font-size: 0.85rem;
+            color: #495057;
+            margin-bottom: 0.25rem;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .slider-value {
+            font-weight: 600;
+            color: #1e3c72;
+        }
+
+        .slider-group input[type="range"] {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: #dee2e6;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        .slider-group input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #1e3c72;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .slider-group input[type="range"]::-webkit-slider-thumb:hover {
+            background: #2a5298;
+            transform: scale(1.1);
+        }
+
+        .slider-group input[type="range"]::-moz-range-thumb {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #1e3c72;
+            cursor: pointer;
+            border: none;
+        }
+
+        .btn-reset {
+            width: 100%;
+            padding: 0.5rem;
+            border: 2px solid #dee2e6;
+            background: white;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            color: #6c757d;
+            transition: all 0.2s ease;
+            margin-top: 0.5rem;
+        }
+
+        .btn-reset:hover {
+            border-color: #dc3545;
+            color: #dc3545;
+            background: #fff5f5;
+        }
+
+        /* Auto layout toggle */
+        .auto-layout-toggle {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            padding: 0.75rem;
+            background: white;
+            border-radius: 6px;
+            border: 2px solid #dee2e6;
+        }
+
+        .auto-layout-toggle input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .auto-layout-toggle label {
+            font-size: 0.85rem;
+            color: #495057;
+            cursor: pointer;
+            margin: 0;
+        }
+
+        /* Split Mode Settings */
+        .split-mode-group {
+            background: white;
+            border: 2px solid #dee2e6;
+            border-radius: 6px;
+            padding: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .split-mode-group label {
+            font-size: 0.85rem;
+            color: #495057;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        .split-mode-options {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .page-input-group {
+            margin-top: 0.75rem;
+        }
+
+        .page-input-group input[type="text"] {
+            width: 100%;
+            padding: 0.5rem;
+            border: 2px solid #e9ecef;
+            border-radius: 6px;
+            font-size: 0.85rem;
+        }
+
+        .page-input-group small {
+            display: block;
+            color: #6c757d;
+            margin-top: 0.25rem;
+            font-size: 0.75rem;
+        }
+
+        /* Slide item badge for dual mode */
+        .slide-badge {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 0.15rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            margin-left: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <h1>📊 Summary Slides Maker</h1>
+        <p>Create professional summary slides with questions, answers, and sources</p>
+    </div>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Left Panel - Slides List -->
+        <div class="slides-panel">
+            <div class="panel-header">
+                <h2>Slides</h2>
+                <span class="slide-count" id="slideCount">0</span>
+            </div>
+            <div class="slides-list" id="slidesList">
+                <div class="empty-state">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+                    <h3>No slides yet</h3>
+                    <p>Add your first slide to get started</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Middle Panel - Editor -->
+        <div class="editor-panel">
+            <div class="panel-header">
+                <h2>Edit Slide</h2>
+            </div>
+            <div class="editor-content">
+                <div class="form-group">
+                    <label for="questionInput">Question</label>
+                    <input type="text" id="questionInput" placeholder="Enter your question here...">
+                </div>
+
+                <div class="form-group">
+                    <label for="answerInput">Answer (Markdown supported)</label>
+                    <textarea id="answerInput" placeholder="Enter the answer... You can use **bold**, *italic*, and lists"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Source</label>
+
+                    <!-- Split Mode Selection -->
+                    <div class="split-mode-group">
+                        <label>Slide Mode</label>
+                        <div class="split-mode-options">
+                            <label class="radio-option">
+                                <input type="radio" name="splitMode" value="single" checked onchange="handleSplitModeChange()">
+                                <span>📄 Single Slide (Q&A + Source together)</span>
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="splitMode" value="dual" onchange="handleSplitModeChange()">
+                                <span>📄📄 Dual Slides (Q&A on page 1, Source on page 2)</span>
+                            </label>
+                        </div>
+
+                        <!-- Source Page Number Input -->
+                        <div class="page-input-group">
+                            <label for="sourcePageInput">Source Page(s)</label>
+                            <input type="text" id="sourcePageInput" placeholder="e.g., 42 or 42-45 or 42, 45, 50" oninput="updatePreview()">
+                            <small>Supports single page, ranges, or multiple pages</small>
+                        </div>
+                    </div>
+
+                    <!-- Source Type Toggle -->
+                    <div class="source-type-toggle">
+                        <label class="radio-option">
+                            <input type="radio" name="sourceType" value="text" checked>
+                            <span>Text</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="sourceType" value="image">
+                            <span>Image</span>
+                        </label>
+                    </div>
+
+                    <div id="textSourceContainer">
+                        <input type="text" id="sourceInput" placeholder="Enter source reference...">
+                    </div>
+
+                    <div id="imageSourceContainer" style="display: none;">
+                        <input type="file" id="imageInput" accept="image/*">
+                        <div class="image-upload-area" id="imageUploadArea">
+                            <div id="uploadPrompt">
+                                <svg width="48" height="48" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="margin: 0 auto 1rem;">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                </svg>
+                                <p>Click to upload image</p>
+                                <small>Supports JPG, PNG, GIF</small>
+                            </div>
+                            <div id="imagePreviewContainer" style="display: none;">
+                                <img id="imagePreview" class="image-preview" alt="Source image preview">
+                                <button type="button" class="btn-secondary" onclick="clearImage()">Remove Image</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Layout Settings Panel -->
+                <div class="layout-settings">
+                    <div class="layout-settings-header" onclick="toggleLayoutSettings()">
+                        <h3>🎨 Layout Settings</h3>
+                        <span class="layout-settings-toggle" id="layoutSettingsToggle">▼</span>
+                    </div>
+                    <div class="layout-settings-content" id="layoutSettingsContent">
+                        <!-- Auto Layout Toggle -->
+                        <div class="auto-layout-toggle">
+                            <input type="checkbox" id="autoLayoutCheckbox" checked onchange="handleAutoLayoutToggle()">
+                            <label for="autoLayoutCheckbox">Auto Layout (Smart Sizing)</label>
+                        </div>
+
+                        <!-- Manual Adjustment Sliders -->
+                        <div class="slider-group">
+                            <label>
+                                <span>Question Size</span>
+                                <span class="slider-value" id="questionSizeValue">1.0x</span>
+                            </label>
+                            <input type="range" id="questionSizeSlider" min="0.8" max="2.0" step="0.1" value="1.0" oninput="handleSliderChange('questionSize', this.value)">
+                        </div>
+
+                        <div class="slider-group">
+                            <label>
+                                <span>Answer Size</span>
+                                <span class="slider-value" id="answerSizeValue">1.0x</span>
+                            </label>
+                            <input type="range" id="answerSizeSlider" min="0.8" max="1.5" step="0.1" value="1.0" oninput="handleSliderChange('answerSize', this.value)">
+                        </div>
+
+                        <div class="slider-group">
+                            <label>
+                                <span>Source Image Height</span>
+                                <span class="slider-value" id="imageHeightValue">200px</span>
+                            </label>
+                            <input type="range" id="imageHeightSlider" min="50" max="400" step="10" value="200" oninput="handleSliderChange('imageHeight', this.value)">
+                        </div>
+
+                        <button class="btn-reset" onclick="resetLayoutSettings()">🔄 Reset to Auto Layout</button>
+                    </div>
+                </div>
+            </div>
+            <div class="editor-actions">
+                <button class="btn btn-secondary" onclick="clearForm()">Clear</button>
+                <button class="btn btn-primary" onclick="addOrUpdateSlide()">
+                    <span id="addUpdateBtnText">Add Slide</span>
+                </button>
+                <button class="btn btn-export" onclick="exportToPDF()">
+                    📄 Export PDF
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Hidden container for PDF export -->
+    <div id="pdfExportContainer"></div>
+
+    <script>
+        // Configure Marked.js for Markdown parsing
+        marked.setOptions({
+            breaks: true,
+            gfm: true
+        });
+
+        // Application State
+        let slides = [];
+        let currentEditingIndex = -1;
+        let currentImageData = null;
+        let sortable = null;
+        let currentLayoutSettings = {
+            autoLayout: true,
+            preset: 'balanced',
+            questionSize: 1.0,
+            answerSize: 1.0,
+            imageHeight: 200
+        };
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeEventListeners();
+            loadFromLocalStorage();
+            updatePreview();
+        });
+
+        function initializeEventListeners() {
+            // Source type toggle
+            document.querySelectorAll('input[name="sourceType"]').forEach(radio => {
+                radio.addEventListener('change', handleSourceTypeChange);
+            });
+
+            // Image upload
+            document.getElementById('imageUploadArea').addEventListener('click', function() {
+                document.getElementById('imageInput').click();
+            });
+
+            document.getElementById('imageInput').addEventListener('change', handleImageUpload);
+
+            // Initialize Sortable for drag-and-drop
+            const slidesList = document.getElementById('slidesList');
+            sortable = new Sortable(slidesList, {
+                animation: 150,
+                ghostClass: 'sortable-ghost',
+                filter: '.empty-state',
+                onEnd: function(evt) {
+                    const item = slides.splice(evt.oldIndex, 1)[0];
+                    slides.splice(evt.newIndex, 0, item);
+                    saveToLocalStorage();
+                    renderSlidesList();
+                }
+            });
+        }
+
+        function handleSourceTypeChange(e) {
+            const isImage = e.target.value === 'image';
+            document.getElementById('textSourceContainer').style.display = isImage ? 'none' : 'block';
+            document.getElementById('imageSourceContainer').style.display = isImage ? 'block' : 'none';
+        }
+
+        function handleImageUpload(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    currentImageData = event.target.result;
+                    document.getElementById('imagePreview').src = currentImageData;
+                    document.getElementById('uploadPrompt').style.display = 'none';
+                    document.getElementById('imagePreviewContainer').style.display = 'block';
+                    document.getElementById('imageUploadArea').classList.add('has-image');
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function clearImage() {
+            currentImageData = null;
+            document.getElementById('imageInput').value = '';
+            document.getElementById('uploadPrompt').style.display = 'block';
+            document.getElementById('imagePreviewContainer').style.display = 'none';
+            document.getElementById('imageUploadArea').classList.remove('has-image');
+        }
+
+        function handleSplitModeChange() {
+            // No longer need to update preview
+        }
+
+        function addOrUpdateSlide() {
+            const question = document.getElementById('questionInput').value.trim();
+            const answer = document.getElementById('answerInput').value.trim();
+            const sourceType = document.querySelector('input[name="sourceType"]:checked').value;
+            const sourceText = document.getElementById('sourceInput').value.trim();
+            const splitMode = document.querySelector('input[name="splitMode"]:checked').value;
+            const sourcePage = document.getElementById('sourcePageInput').value.trim();
+
+            if (!question || !answer) {
+                alert('Please enter both question and answer');
+                return;
+            }
+
+            const slideData = {
+                question,
+                answer,
+                sourceType,
+                sourceText: sourceType === 'text' ? sourceText : '',
+                sourceImage: sourceType === 'image' ? currentImageData : null,
+                splitMode, // Save split mode
+                sourcePage, // Save source page number
+                layoutSettings: { ...currentLayoutSettings } // Save current layout settings
+            };
+
+            if (currentEditingIndex === -1) {
+                // Add new slide
+                slides.push(slideData);
+            } else {
+                // Update existing slide
+                slides[currentEditingIndex] = slideData;
+                currentEditingIndex = -1;
+                document.getElementById('addUpdateBtnText').textContent = 'Add Slide';
+            }
+
+            saveToLocalStorage();
+            renderSlidesList();
+            clearForm();
+        }
+
+        function renderSlidesList() {
+            const listEl = document.getElementById('slidesList');
+
+            if (slides.length === 0) {
+                listEl.innerHTML = `
+                    <div class="empty-state">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                        <h3>No slides yet</h3>
+                        <p>Add your first slide to get started</p>
+                    </div>
+                `;
+            } else {
+                let currentPageNum = 1;
+                listEl.innerHTML = slides.map((slide, index) => {
+                    const slideMode = slide.splitMode || 'single';
+                    const isDual = slideMode === 'dual';
+                    const pageRange = isDual ? `${currentPageNum}-${currentPageNum + 1}` : currentPageNum;
+                    const badge = isDual ? '<span class="slide-badge">Dual</span>' : '';
+
+                    const html = `
+                        <div class="slide-item ${currentEditingIndex === index ? 'active' : ''}" onclick="editSlide(${index})">
+                            <div class="slide-number">${isDual ? '📄📄' : currentPageNum}</div>
+                            <h3>${escapeHtml(slide.question)}${badge}</h3>
+                            <p>${escapeHtml(slide.answer.substring(0, 50))}${slide.answer.length > 50 ? '...' : ''}</p>
+                            <div class="slide-actions">
+                                <button class="btn-icon" onclick="event.stopPropagation(); editSlide(${index})" title="Edit">
+                                    ✏️
+                                </button>
+                                <button class="btn-icon delete" onclick="event.stopPropagation(); deleteSlide(${index})" title="Delete">
+                                    🗑️
+                                </button>
+                            </div>
+                        </div>
+                    `;
+
+                    currentPageNum += isDual ? 2 : 1;
+                    return html;
+                }).join('');
+            }
+
+            // Count total pages (not just slides)
+            const totalPages = slides.reduce((sum, slide) => {
+                return sum + (slide.splitMode === 'dual' ? 2 : 1);
+            }, 0);
+            document.getElementById('slideCount').textContent = `${slides.length} (${totalPages} pages)`;
+        }
+
+        function editSlide(index) {
+            currentEditingIndex = index;
+            const slide = slides[index];
+
+            document.getElementById('questionInput').value = slide.question;
+            document.getElementById('answerInput').value = slide.answer;
+
+            // Load split mode
+            const splitMode = slide.splitMode || 'single';
+            document.querySelector(`input[name="splitMode"][value="${splitMode}"]`).checked = true;
+
+            // Load source page
+            document.getElementById('sourcePageInput').value = slide.sourcePage || '';
+
+            if (slide.sourceType === 'image') {
+                document.querySelector('input[name="sourceType"][value="image"]').checked = true;
+                handleSourceTypeChange({ target: { value: 'image' } });
+
+                if (slide.sourceImage) {
+                    currentImageData = slide.sourceImage;
+                    document.getElementById('imagePreview').src = currentImageData;
+                    document.getElementById('uploadPrompt').style.display = 'none';
+                    document.getElementById('imagePreviewContainer').style.display = 'block';
+                    document.getElementById('imageUploadArea').classList.add('has-image');
+                }
+            } else {
+                document.querySelector('input[name="sourceType"][value="text"]').checked = true;
+                handleSourceTypeChange({ target: { value: 'text' } });
+                document.getElementById('sourceInput').value = slide.sourceText || '';
+            }
+
+            // Load layout settings if available
+            if (slide.layoutSettings) {
+                currentLayoutSettings = { ...slide.layoutSettings };
+                document.getElementById('autoLayoutCheckbox').checked = currentLayoutSettings.autoLayout;
+
+                updateSliderValues();
+                handleAutoLayoutToggle();
+            } else {
+                // Reset to default if no settings saved
+                resetLayoutSettings();
+            }
+
+            document.getElementById('addUpdateBtnText').textContent = 'Update Slide';
+            renderSlidesList();
+        }
+
+        function deleteSlide(index) {
+            if (confirm('Are you sure you want to delete this slide?')) {
+                slides.splice(index, 1);
+                if (currentEditingIndex === index) {
+                    clearForm();
+                }
+                saveToLocalStorage();
+                renderSlidesList();
+            }
+        }
+
+        function clearForm() {
+            document.getElementById('questionInput').value = '';
+            document.getElementById('answerInput').value = '';
+            document.getElementById('sourceInput').value = '';
+            document.getElementById('sourcePageInput').value = '';
+            document.querySelector('input[name="sourceType"][value="text"]').checked = true;
+            document.querySelector('input[name="splitMode"][value="single"]').checked = true;
+            handleSourceTypeChange({ target: { value: 'text' } });
+            clearImage();
+            currentEditingIndex = -1;
+            document.getElementById('addUpdateBtnText').textContent = 'Add Slide';
+
+            // Reset layout settings to default
+            resetLayoutSettings();
+
+            renderSlidesList();
+        }
+
+        async function exportToPDF() {
+            if (slides.length === 0) {
+                alert('Please add at least one slide before exporting');
+                return;
+            }
+
+            // Show loading state
+            const exportBtn = event.target;
+            const originalText = exportBtn.innerHTML;
+            exportBtn.innerHTML = '⏳ Generating...';
+            exportBtn.disabled = true;
+
+            try {
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF({
+                    orientation: 'landscape',
+                    unit: 'px',
+                    format: [1920, 1080]
+                });
+
+                const container = document.getElementById('pdfExportContainer');
+                let isFirstPage = true;
+
+                for (let i = 0; i < slides.length; i++) {
+                    const slide = slides[i];
+                    const splitMode = slide.splitMode || 'single';
+
+                    // Get layout settings, with smart auto-calculation as fallback
+                    let layout = slide.layoutSettings || {
+                        questionSize: 1.0,
+                        answerSize: 1.0,
+                        imageHeight: 400
+                    };
+
+                    // If auto layout is enabled, calculate optimal layout
+                    if (layout.autoLayout || !slide.layoutSettings) {
+                        layout = calculateOptimalLayout(slide, splitMode);
+                    }
+
+                    // Calculate font sizes and image height with maximized space usage
+                    const questionFontSize = 3.5 * layout.questionSize;
+                    const answerFontSize = 2.5 * layout.answerSize;
+                    const imageMaxHeight = Math.max(200, layout.imageHeight);
+
+                    if (splitMode === 'single') {
+                        // Single page mode with dynamic space allocation
+                        const slideEl = document.createElement('div');
+                        slideEl.className = 'pdf-slide';
+                        slideEl.style.justifyContent = 'flex-start';
+
+                        const hasSource = (slide.sourceType === 'text' && slide.sourceText) || (slide.sourceType === 'image' && slide.sourceImage);
+
+                        let slideHTML = `<div class="slide-question" style="font-size: ${questionFontSize}rem; flex-shrink: 0;">${escapeHtml(slide.question)}</div>`;
+                        slideHTML += `<div class="slide-answer" style="font-size: ${answerFontSize}rem; flex-shrink: 0; overflow: visible;">${marked.parse(slide.answer)}</div>`;
+
+                        if (slide.sourceType === 'text' && slide.sourceText) {
+                            slideHTML += `
+                                <div class="slide-source" style="flex-shrink: 0; margin-top: auto;">
+                                    <div class="slide-source-label">Source:</div>
+                                    ${escapeHtml(slide.sourceText)}
+                                </div>
+                            `;
+                        } else if (slide.sourceType === 'image' && slide.sourceImage) {
+                            slideHTML += `
+                                <div class="slide-source" style="flex-shrink: 0; margin-top: auto; text-align: center;">
+                                    <div class="slide-source-label">Source:</div>
+                                    <img src="${slide.sourceImage}" class="slide-source-image" style="max-height: ${imageMaxHeight}px; max-width: 100%; object-fit: contain;" alt="Source">
+                                </div>
+                            `;
+                        }
+
+                        slideEl.innerHTML = slideHTML;
+                        container.appendChild(slideEl);
+
+                        const canvas = await html2canvas(slideEl, {
+                            scale: 2,
+                            useCORS: true,
+                            backgroundColor: '#ffffff'
+                        });
+
+                        const imgData = canvas.toDataURL('image/png');
+
+                        if (!isFirstPage) {
+                            pdf.addPage();
+                        }
+                        isFirstPage = false;
+
+                        pdf.addImage(imgData, 'PNG', 0, 0, 1920, 1080);
+                        container.removeChild(slideEl);
+
+                    } else {
+                        // Dual page mode - generate two pages with maximized space
+
+                        // Page 1: Q&A with dynamic layout
+                        const page1El = document.createElement('div');
+                        page1El.className = 'pdf-slide';
+                        page1El.style.justifyContent = 'flex-start';
+                        let page1HTML = `<div class="slide-question" style="font-size: ${questionFontSize}rem; flex-shrink: 0;">${escapeHtml(slide.question)}</div>`;
+                        page1HTML += `<div class="slide-answer" style="font-size: ${answerFontSize}rem; flex-shrink: 0; overflow: visible;">${marked.parse(slide.answer)}</div>`;
+                        page1El.innerHTML = page1HTML;
+                        container.appendChild(page1El);
+
+                        const canvas1 = await html2canvas(page1El, {
+                            scale: 2,
+                            useCORS: true,
+                            backgroundColor: '#ffffff'
+                        });
+
+                        const imgData1 = canvas1.toDataURL('image/png');
+
+                        if (!isFirstPage) {
+                            pdf.addPage();
+                        }
+                        isFirstPage = false;
+
+                        pdf.addImage(imgData1, 'PNG', 0, 0, 1920, 1080);
+                        container.removeChild(page1El);
+
+                        // Page 2: Source
+                        const page2El = document.createElement('div');
+                        page2El.className = 'pdf-slide';
+                        page2El.style.display = 'flex';
+                        page2El.style.flexDirection = 'column';
+
+                        const pageLabel = slide.sourcePage ? `Page ${slide.sourcePage}` : 'Reference';
+                        let page2HTML = `<div class="source-page-title" style="font-size: 4rem; font-weight: 700; color: #1e3c72; text-align: center; margin-bottom: 3rem; padding-bottom: 3rem; border-bottom: 8px solid #e9ecef;">Source: ${pageLabel}</div>`;
+
+                        page2HTML += '<div class="source-page-content" style="flex: 1; display: flex; align-items: center; justify-content: center; overflow: hidden;">';
+
+                        if (slide.sourceType === 'text' && slide.sourceText) {
+                            page2HTML += `<div style="font-size: 2.8rem; color: #2c3e50; line-height: 1.6; padding: 2rem;">${escapeHtml(slide.sourceText)}</div>`;
+                        } else if (slide.sourceType === 'image' && slide.sourceImage) {
+                            page2HTML += `<img src="${slide.sourceImage}" style="max-width: 90%; max-height: 90%; object-fit: contain;" alt="Source">`;
+                        }
+
+                        page2HTML += '</div>';
+                        page2El.innerHTML = page2HTML;
+                        container.appendChild(page2El);
+
+                        const canvas2 = await html2canvas(page2El, {
+                            scale: 2,
+                            useCORS: true,
+                            backgroundColor: '#ffffff'
+                        });
+
+                        const imgData2 = canvas2.toDataURL('image/png');
+                        pdf.addPage();
+                        pdf.addImage(imgData2, 'PNG', 0, 0, 1920, 1080);
+                        container.removeChild(page2El);
+                    }
+                }
+
+                // Save PDF
+                const timestamp = new Date().toISOString().split('T')[0];
+                pdf.save(`summary-slides-${timestamp}.pdf`);
+
+            } catch (error) {
+                console.error('Error generating PDF:', error);
+                alert('Error generating PDF. Please try again.');
+            } finally {
+                exportBtn.innerHTML = originalText;
+                exportBtn.disabled = false;
+            }
+        }
+
+        function saveToLocalStorage() {
+            try {
+                localStorage.setItem('summarySlides', JSON.stringify(slides));
+            } catch (e) {
+                console.warn('Failed to save to localStorage:', e);
+            }
+        }
+
+        function loadFromLocalStorage() {
+            try {
+                const saved = localStorage.getItem('summarySlides');
+                if (saved) {
+                    slides = JSON.parse(saved);
+                    renderSlidesList();
+                }
+            } catch (e) {
+                console.warn('Failed to load from localStorage:', e);
+            }
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // ============ Layout Settings Functions ============
+
+        function toggleLayoutSettings() {
+            const content = document.getElementById('layoutSettingsContent');
+            const toggle = document.getElementById('layoutSettingsToggle');
+            const isExpanded = content.classList.contains('expanded');
+
+            if (isExpanded) {
+                content.classList.remove('expanded');
+                toggle.textContent = '▼';
+            } else {
+                content.classList.add('expanded');
+                toggle.textContent = '▲';
+            }
+        }
+
+        function handleAutoLayoutToggle() {
+            const isAuto = document.getElementById('autoLayoutCheckbox').checked;
+            currentLayoutSettings.autoLayout = isAuto;
+
+            // Disable/enable manual controls
+            document.getElementById('questionSizeSlider').disabled = isAuto;
+            document.getElementById('answerSizeSlider').disabled = isAuto;
+            document.getElementById('imageHeightSlider').disabled = isAuto;
+
+            if (isAuto) {
+                applyAutoLayout();
+            }
+        }
+
+        function applyAutoLayout() {
+            const question = document.getElementById('questionInput').value;
+            const answer = document.getElementById('answerInput').value;
+            const sourceType = document.querySelector('input[name="sourceType"]:checked').value;
+
+            // Auto-calculate question size based on length
+            let questionSize = 1.0;
+            if (question.length < 30) {
+                questionSize = 1.8; // Large for short questions
+            } else if (question.length < 60) {
+                questionSize = 1.3; // Medium
+            } else if (question.length < 100) {
+                questionSize = 1.0; // Normal
+            } else {
+                questionSize = 0.8; // Small for long questions
+            }
+
+            // Auto-calculate answer size based on content
+            let answerSize = 1.0;
+            const answerLines = answer.split('\n').length;
+            const answerLength = answer.length;
+
+            if (answerLength < 100) {
+                answerSize = 1.2; // Large for short answers
+            } else if (answerLength < 300) {
+                answerSize = 1.0; // Normal
+            } else if (answerLength < 600) {
+                answerSize = 0.9; // Slightly smaller
+            } else {
+                answerSize = 0.8; // Small for long answers
+            }
+
+            // Auto-calculate image height
+            let imageHeight = 200;
+            if (sourceType === 'image') {
+                if (answerLength < 200) {
+                    imageHeight = 300; // Larger image for short content
+                } else if (answerLength < 400) {
+                    imageHeight = 200; // Normal
+                } else {
+                    imageHeight = 150; // Smaller for long content
+                }
+            }
+
+            // Update settings
+            currentLayoutSettings.questionSize = questionSize;
+            currentLayoutSettings.answerSize = answerSize;
+            currentLayoutSettings.imageHeight = imageHeight;
+
+            // Update sliders
+            updateSliderValues();
+        }
+
+        function handleSliderChange(type, value) {
+            // Disable auto layout when manually adjusting
+            if (currentLayoutSettings.autoLayout) {
+                document.getElementById('autoLayoutCheckbox').checked = false;
+                currentLayoutSettings.autoLayout = false;
+            }
+
+            currentLayoutSettings.preset = 'custom';
+
+            // Update value
+            value = parseFloat(value);
+            currentLayoutSettings[type] = value;
+
+            // Update display
+            if (type === 'questionSize') {
+                document.getElementById('questionSizeValue').textContent = value.toFixed(1) + 'x';
+            } else if (type === 'answerSize') {
+                document.getElementById('answerSizeValue').textContent = value.toFixed(1) + 'x';
+            } else if (type === 'imageHeight') {
+                document.getElementById('imageHeightValue').textContent = value + 'px';
+            }
+        }
+
+        function updateSliderValues() {
+            document.getElementById('questionSizeSlider').value = currentLayoutSettings.questionSize;
+            document.getElementById('questionSizeValue').textContent = currentLayoutSettings.questionSize.toFixed(1) + 'x';
+
+            document.getElementById('answerSizeSlider').value = currentLayoutSettings.answerSize;
+            document.getElementById('answerSizeValue').textContent = currentLayoutSettings.answerSize.toFixed(1) + 'x';
+
+            document.getElementById('imageHeightSlider').value = currentLayoutSettings.imageHeight;
+            document.getElementById('imageHeightValue').textContent = currentLayoutSettings.imageHeight + 'px';
+        }
+
+        function resetLayoutSettings() {
+            currentLayoutSettings = {
+                autoLayout: true,
+                preset: 'balanced',
+                questionSize: 1.0,
+                answerSize: 1.0,
+                imageHeight: 200
+            };
+
+            document.getElementById('autoLayoutCheckbox').checked = true;
+
+            applyAutoLayout();
+            updateSliderValues();
+            handleAutoLayoutToggle();
+        }
+
+        // ============ Smart Layout Calculation ============
+
+        /**
+         * Calculate optimal layout to maximize space usage
+         * Analyzes content length and dynamically adjusts sizing
+         */
+        function calculateOptimalLayout(slide, splitMode) {
+            const question = slide.question;
+            const answer = slide.answer;
+            const sourceType = slide.sourceType;
+            const hasSource = (sourceType === 'text' && slide.sourceText) || (sourceType === 'image' && slide.sourceImage);
+
+            // Available vertical space in pixels (1080px height - 160px padding)
+            const availableHeight = 920;
+
+            // Calculate content complexity
+            const questionLength = question.length;
+            const answerLength = answer.length;
+            const answerLines = answer.split('\n').length;
+
+            // Estimate required heights based on content
+            let questionHeight, answerHeight, sourceHeight;
+
+            // For dual mode, only Q&A on page 1
+            if (splitMode === 'dual') {
+                // Question sizing for dual mode
+                if (questionLength < 40) {
+                    questionHeight = 180; // Large, prominent
+                } else if (questionLength < 80) {
+                    questionHeight = 140;
+                } else if (questionLength < 120) {
+                    questionHeight = 120;
+                } else {
+                    questionHeight = 100;
+                }
+
+                // Rest of space for answer
+                answerHeight = availableHeight - questionHeight - 80; // 80px margin
+
+                sourceHeight = 0; // Source on separate page
+            } else {
+                // Single mode - need to fit everything
+
+                // Question sizing
+                if (questionLength < 40) {
+                    questionHeight = 150;
+                } else if (questionLength < 80) {
+                    questionHeight = 120;
+                } else {
+                    questionHeight = 100;
+                }
+
+                // Source sizing
+                if (!hasSource) {
+                    sourceHeight = 0;
+                    answerHeight = availableHeight - questionHeight - 60;
+                } else {
+                    if (sourceType === 'image') {
+                        // Image sources need more space
+                        if (answerLength < 200) {
+                            sourceHeight = 400; // Large image for short answer
+                        } else if (answerLength < 400) {
+                            sourceHeight = 300;
+                        } else if (answerLength < 600) {
+                            sourceHeight = 250;
+                        } else {
+                            sourceHeight = 200; // Minimal image for long answer
+                        }
+                    } else {
+                        // Text sources are more flexible
+                        const sourceLength = slide.sourceText.length;
+                        if (sourceLength < 50) {
+                            sourceHeight = 80;
+                        } else if (sourceLength < 100) {
+                            sourceHeight = 100;
+                        } else {
+                            sourceHeight = 120;
+                        }
+                    }
+
+                    answerHeight = availableHeight - questionHeight - sourceHeight - 120; // margins
+                }
+            }
+
+            // Calculate font size multipliers with improved logic
+            const questionSizeMultiplier = questionHeight / 120; // Base 120px
+
+            // Improved answer size calculation
+            // Estimate lines needed (assuming ~60 chars per line at base size)
+            const estimatedLines = Math.ceil(answerLength / 60) + answerLines;
+            const lineHeight = 1.6; // line-height from CSS
+            const baseLineSize = 2.5; // base font size in rem
+            const pixelsPerLine = baseLineSize * 16 * lineHeight; // Convert rem to px
+
+            // Calculate how much space we have per line
+            const availableSpace = answerHeight;
+            const requiredSpace = estimatedLines * pixelsPerLine;
+
+            // Scale font size to fit, with reasonable bounds
+            let answerSizeMultiplier = availableSpace / requiredSpace;
+            answerSizeMultiplier = Math.min(1.5, Math.max(0.75, answerSizeMultiplier)); // 0.75x - 1.5x range
+
+            const imageSizeMultiplier = sourceHeight / 300; // Base 300px
+
+            return {
+                questionSize: Math.round(questionSizeMultiplier * 10) / 10, // Round to 1 decimal
+                answerSize: Math.round(answerSizeMultiplier * 10) / 10,
+                imageHeight: Math.round(sourceHeight),
+                estimatedFit: true // Indicates this is an optimized layout
+            };
+        }
+    </script>
+</body>
+</html>
