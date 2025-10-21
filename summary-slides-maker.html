@@ -242,6 +242,87 @@
             min-height: 120px;
         }
 
+        /* Title Input with Preset Dropdown */
+        .title-input-wrapper {
+            display: flex;
+            gap: 0.5rem;
+            position: relative;
+            flex-wrap: wrap;
+        }
+
+        .title-input-wrapper input {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .preset-dropdown-btn {
+            width: 42px;
+            height: 42px;
+            background: white;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            color: #6c757d;
+            transition: all 0.2s ease;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .preset-dropdown-btn:hover {
+            background: #f8f9fa;
+            border-color: #1e3c72;
+            color: #1e3c72;
+        }
+
+        .preset-dropdown-btn:active {
+            transform: scale(0.95);
+        }
+
+        .preset-menu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            width: 100%;
+            background: white;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            max-height: 300px;
+            overflow-y: auto;
+            z-index: 1000;
+            margin-top: 0.5rem;
+        }
+
+        .preset-menu.show {
+            display: block;
+        }
+
+        .preset-item {
+            padding: 0.75rem 1rem;
+            cursor: pointer;
+            transition: background 0.2s ease;
+            border-bottom: 1px solid #f8f9fa;
+            font-size: 0.9rem;
+            color: #2c3e50;
+        }
+
+        .preset-item:last-child {
+            border-bottom: none;
+        }
+
+        .preset-item:hover {
+            background: #f8f9fa;
+            color: #1e3c72;
+        }
+
+        .preset-item:active {
+            background: #e9ecef;
+        }
+
         /* Content Editor (contenteditable) */
         .answer-editor {
             width: 100%;
@@ -304,21 +385,27 @@
             text-decoration: underline;
         }
 
-        /* Lists - remove indentation for alignment */
+        /* Lists - add left margin for indentation */
         .answer-editor ul,
         .answer-editor ol {
-            margin: 0.5rem 0;
+            margin: 0.5rem 0 0.5rem 2rem;
             padding-left: 0;
             list-style-position: inside;
         }
 
         .answer-editor li {
             margin: 0.25rem 0;
-            padding-left: 0;
+            padding-left: 0.3em;
+            text-indent: -0.3em;
         }
 
-        /* Ensure all top-level content aligns */
-        .answer-editor > * {
+        /* Unify spacing between bullet/number and text */
+        .answer-editor ul li::marker {
+            content: "•\00a0";
+        }
+
+        /* Ensure all top-level content aligns (except lists) */
+        .answer-editor > *:not(ul):not(ol) {
             margin-left: 0;
             padding-left: 0;
         }
@@ -471,6 +558,25 @@
             line-height: 1.6;
             margin-bottom: 3rem;
             text-align: left;
+        }
+
+        /* PDF - List styles to match editor */
+        .pdf-slide .slide-answer ul,
+        .pdf-slide .slide-answer ol {
+            margin: 0.5rem 0 0.5rem 2rem;
+            padding-left: 0;
+            list-style-position: inside;
+        }
+
+        .pdf-slide .slide-answer li {
+            margin: 0.25rem 0;
+            padding-left: 0.3em;
+            text-indent: -0.3em;
+        }
+
+        /* PDF - Unify spacing between bullet/number and text */
+        .pdf-slide .slide-answer ul li::marker {
+            content: "•\00a0";
         }
 
         .pdf-slide .slide-source {
@@ -675,7 +781,30 @@
             <div class="editor-content">
                 <div class="form-group">
                     <label for="questionInput">Title</label>
-                    <input type="text" id="questionInput" placeholder="Enter your question here...">
+                    <div class="title-input-wrapper">
+                        <input type="text" id="questionInput" placeholder="Enter your title here...">
+                        <button type="button" class="preset-dropdown-btn" onclick="togglePresetMenu()" title="Choose preset title">
+                            ▼
+                        </button>
+                        <!-- Preset Title Menu -->
+                        <div class="preset-menu" id="presetMenu">
+                            <div class="preset-item" onclick="selectPreset('(Aim & RQs) Aim of the Study')">(Aim & RQs) Aim of the Study</div>
+                            <div class="preset-item" onclick="selectPreset('(Aim & RQs) Research Questions (or Hypotheses)')">(Aim & RQs) Research Questions (or Hypotheses)</div>
+                            <div class="preset-item" onclick="selectPreset('(Aim & RQs) Research Questions and Study Background Alignment')">(Aim & RQs) Research Questions and Study Background Alignment</div>
+                            <div class="preset-item" onclick="selectPreset('(Intro & background) Main Educational Issue or Problem Addressed')">(Intro & background) Main Educational Issue or Problem Addressed</div>
+                            <div class="preset-item" onclick="selectPreset('(Intro & background) Research Gap in the Existing Literature')">(Intro & background) Research Gap in the Existing Literature</div>
+                            <div class="preset-item" onclick="selectPreset('(Intro & background) Significance and Rationale of the Study')">(Intro & background) Significance and Rationale of the Study</div>
+                            <div class="preset-item" onclick="selectPreset('(Method) Research Design')">(Method) Research Design</div>
+                            <div class="preset-item" onclick="selectPreset('(Method) Participants')">(Method) Participants</div>
+                            <div class="preset-item" onclick="selectPreset('(Method) Instruments and Data Collection Tools')">(Method) Instruments and Data Collection Tools</div>
+                            <div class="preset-item" onclick="selectPreset('(Method) Data Collection and Analysis Procedures')">(Method) Data Collection and Analysis Procedures</div>
+                            <div class="preset-item" onclick="selectPreset('(Results) Main Findings of the Study')">(Results) Main Findings of the Study</div>
+                            <div class="preset-item" onclick="selectPreset('(Results) Linking Results to the Research Questions')">(Results) Linking Results to the Research Questions</div>
+                            <div class="preset-item" onclick="selectPreset('(Discussion) Implications for Science Education or Teacher Development')">(Discussion) Implications for Science Education or Teacher Development</div>
+                            <div class="preset-item" onclick="selectPreset('(Discussion) Limitations of the Study')">(Discussion) Limitations of the Study</div>
+                            <div class="preset-item" onclick="selectPreset('(Discussion) Applications for Teaching Practice and Teacher Education')">(Discussion) Applications for Teaching Practice and Teacher Education</div>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="form-group">
@@ -1375,6 +1504,42 @@
                         formatText('underline');
                         break;
                 }
+            }
+        });
+
+        // ============ Preset Title Menu Functions ============
+
+        /**
+         * Toggle preset title menu visibility
+         */
+        function togglePresetMenu() {
+            const menu = document.getElementById('presetMenu');
+            menu.classList.toggle('show');
+        }
+
+        /**
+         * Select a preset title and fill into input
+         * @param {string} title - The preset title text
+         */
+        function selectPreset(title) {
+            const input = document.getElementById('questionInput');
+            input.value = title;
+
+            // Close menu
+            const menu = document.getElementById('presetMenu');
+            menu.classList.remove('show');
+
+            // Focus on input for user to see the selection
+            input.focus();
+        }
+
+        // Close preset menu when clicking outside
+        document.addEventListener('click', function(event) {
+            const menu = document.getElementById('presetMenu');
+            const wrapper = document.querySelector('.title-input-wrapper');
+
+            if (menu && wrapper && !wrapper.contains(event.target)) {
+                menu.classList.remove('show');
             }
         });
     </script>
