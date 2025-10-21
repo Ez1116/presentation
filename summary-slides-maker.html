@@ -810,7 +810,7 @@
                 <div class="form-group">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
                         <label for="answerInput" style="margin-bottom: 0;">Content</label>
-                        <span id="charCount" class="char-counter">Words count: 0/1000</span>
+                        <span id="charCount" class="char-counter">Words count: 0/800</span>
                     </div>
 
                     <div id="answerInput"
@@ -1205,7 +1205,7 @@
             // Get text content (strip HTML tags)
             const text = editor.textContent || editor.innerText || '';
             const charCount = text.length;
-            const limit = 1000;
+            const limit = 800;
 
             // Update display
             counter.textContent = `Words count: ${charCount}/${limit}`;
@@ -1215,7 +1215,7 @@
 
             if (charCount >= limit) {
                 counter.classList.add('over-limit'); // Red
-            } else if (charCount >= 800) {
+            } else if (charCount >= 650) {
                 counter.classList.add('warning'); // Orange
             }
         }
