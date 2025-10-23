@@ -757,6 +757,66 @@
             transform: scale(1.1);
         }
 
+        /* Statistical Symbols Menu */
+        .stats-symbol-container {
+            position: relative;
+            display: inline-block;
+        }
+
+        .stats-symbol-menu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background: white;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 1000;
+            margin-top: 0.25rem;
+            min-width: 240px;
+            max-height: 320px;
+            overflow-y: auto;
+        }
+
+        .stats-symbol-menu.show {
+            display: block;
+        }
+
+        .stats-symbol-item {
+            padding: 0.65rem 1rem;
+            cursor: pointer;
+            transition: background 0.2s ease;
+            border-bottom: 1px solid #f8f9fa;
+            font-size: 0.9rem;
+            color: #2c3e50;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .stats-symbol-item:last-child {
+            border-bottom: none;
+        }
+
+        .stats-symbol-item:hover {
+            background: #f8f9fa;
+            color: #1e3c72;
+        }
+
+        .stats-symbol-item:active {
+            background: #e9ecef;
+        }
+
+        .stats-symbol-item em {
+            font-weight: 600;
+            font-style: italic;
+        }
+
+        .stats-symbol-item sup {
+            font-size: 0.75em;
+        }
+
         /* Character Counter */
         .char-counter {
             font-size: 0.85rem;
@@ -879,6 +939,27 @@
                                 <div class="color-option" style="background: #6c757d;" onclick="applyColor('#6c757d')" title="Gray"></div>
                                 <div class="color-option" style="background: #000000;" onclick="applyColor('#000000')" title="Black"></div>
                                 <div class="color-option" style="background: #ffffff; border: 1px solid #dee2e6;" onclick="applyColor('#ffffff')" title="White"></div>
+                            </div>
+                        </div>
+
+                        <div class="toolbar-separator"></div>
+
+                        <!-- Statistical Symbols -->
+                        <div class="stats-symbol-container">
+                            <button type="button" class="toolbar-btn" onclick="toggleStatsSymbolMenu()" title="Insert Statistical Symbol">
+                                Σ
+                            </button>
+                            <div class="stats-symbol-menu" id="statsSymbolMenu">
+                                <div class="stats-symbol-item" onclick="insertStatsSymbol('<em>M</em>')"><em>M</em> (Mean)</div>
+                                <div class="stats-symbol-item" onclick="insertStatsSymbol('<em>SD</em>')"><em>SD</em> (Standard Deviation)</div>
+                                <div class="stats-symbol-item" onclick="insertStatsSymbol('<em>p</em>')"><em>p</em> (p-value)</div>
+                                <div class="stats-symbol-item" onclick="insertStatsSymbol('<em>t</em>')"><em>t</em> (t-statistic)</div>
+                                <div class="stats-symbol-item" onclick="insertStatsSymbol('<em>z</em>')"><em>z</em> (z-score)</div>
+                                <div class="stats-symbol-item" onclick="insertStatsSymbol('<em>F</em>')"><em>F</em> (F-statistic)</div>
+                                <div class="stats-symbol-item" onclick="insertStatsSymbol('<em>r</em>')"><em>r</em> (Correlation)</div>
+                                <div class="stats-symbol-item" onclick="insertStatsSymbol('<em>R</em><sup>2</sup>')"><em>R</em><sup>2</sup> (R-squared)</div>
+                                <div class="stats-symbol-item" onclick="insertStatsSymbol('<em>χ</em><sup>2</sup>')"><em>χ</em><sup>2</sup> (Chi-square)</div>
+                                <div class="stats-symbol-item" onclick="insertStatsSymbol('Cohen\'s <em>d</em>')">Cohen's <em>d</em> (Effect size)</div>
                             </div>
                         </div>
 
@@ -1485,6 +1566,52 @@
         }
 
         /**
+         * Toggle statistical symbols menu visibility
+         * @param {boolean} [forceState] - Optional: force show (true) or hide (false)
+         */
+        function toggleStatsSymbolMenu(forceState) {
+            const menu = document.getElementById('statsSymbolMenu');
+
+            // Save selection before opening menu
+            if (forceState === true || (forceState === undefined && !menu.classList.contains('show'))) {
+                saveSelection();
+            }
+
+            if (forceState === false) {
+                menu.classList.remove('show');
+            } else if (forceState === true) {
+                menu.classList.add('show');
+            } else {
+                menu.classList.toggle('show');
+            }
+        }
+
+        /**
+         * Insert statistical symbol at cursor position
+         * @param {string} html - HTML string of the statistical symbol
+         */
+        function insertStatsSymbol(html) {
+            const editor = document.getElementById('answerInput');
+
+            // Restore the saved selection
+            restoreSelection();
+            editor.focus();
+
+            try {
+                // Insert the symbol HTML at cursor position
+                document.execCommand('insertHTML', false, html + '&nbsp;');
+            } catch (e) {
+                console.warn('insertStatsSymbol failed', e);
+            }
+
+            // Hide menu after insertion
+            toggleStatsSymbolMenu(false);
+
+            // Update character count
+            updateCharCount();
+        }
+
+        /**
          * Get editor content as HTML
          */
         function getEditorContent() {
@@ -1530,6 +1657,16 @@
 
             if (colorPalette && !colorPickerContainer.contains(event.target)) {
                 colorPalette.classList.remove('show');
+            }
+        });
+
+        // Close statistical symbols menu when clicking outside
+        document.addEventListener('click', function(event) {
+            const statsSymbolContainer = document.querySelector('.stats-symbol-container');
+            const statsSymbolMenu = document.getElementById('statsSymbolMenu');
+
+            if (statsSymbolMenu && statsSymbolContainer && !statsSymbolContainer.contains(event.target)) {
+                statsSymbolMenu.classList.remove('show');
             }
         });
 
