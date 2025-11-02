@@ -1,0 +1,521 @@
+<!DOCTYPE HTML>
+<html lang="zh-TW">
+<head>
+    <title>The Geocentric-Heliocentric Revolution - 從地心說到日心說的革命</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+    <!-- 共用 CSS 資源 -->
+    <link rel="stylesheet" href="../story-temp/assets/css/main.css" />
+    <noscript><link rel="stylesheet" href="../story-temp/assets/css/noscript.css" /></noscript>
+
+    <!-- 自訂樣式 -->
+    <style>
+        /* ========== 滾動進度條 ========== */
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: rgba(255,255,255,0.1);
+            z-index: 10000;
+        }
+
+        .progress-bar .progress {
+            height: 100%;
+            background: linear-gradient(to right, #ff6b6b, #4ecdc4);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        /* ========== 圖片完整顯示優化 ========== */
+        .banner.style1 .image img,
+        .spotlight.style1 .image img {
+            -moz-object-fit: contain !important;
+            -webkit-object-fit: contain !important;
+            -ms-object-fit: contain !important;
+            object-fit: contain !important;
+            -moz-object-position: center !important;
+            -webkit-object-position: center !important;
+            -ms-object-position: center !important;
+            object-position: center !important;
+        }
+
+        /* 圖片容器背景改為白色 */
+        .banner.style1 .image,
+        .spotlight.style1 .image {
+            background-color: #ffffff !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+        }
+
+        /* Banner 封面比例調整 */
+        .banner.style1 .content {
+            width: 65% !important;
+        }
+
+        .banner.style1 .image {
+            width: 35% !important;
+        }
+
+        /* Spotlight 模組比例調整 */
+        .spotlight.style1 .content {
+            width: 60% !important;
+        }
+
+        .spotlight.style1 .image {
+            width: 40% !important;
+        }
+
+        /* ========== 視覺區分系統 ========== */
+        /* Content 區塊 - 白色背景 */
+        .content-block {
+            background-color: #ffffff;
+            padding: 3rem;
+            border-left: 4px solid #ff6b6b;
+        }
+
+        .content-block h3::before {
+            content: "📚 ";
+            margin-right: 0.5rem;
+        }
+
+        /* HOS 區塊 - 淺灰色背景 */
+        .hos-block {
+            background-color: #f5f5f5;
+            padding: 3rem;
+            border-left: 4px solid #4ecdc4;
+        }
+
+        .hos-block h3::before {
+            content: "📜 ";
+            margin-right: 0.5rem;
+        }
+
+        /* NOS 區塊 - 淺藍色背景 */
+        .nos-block {
+            background-color: #e3f2fd;
+            padding: 3rem;
+            border-left: 4px solid #2196f3;
+        }
+
+        .nos-block h3::before {
+            content: "🔬 ";
+            margin-right: 0.5rem;
+        }
+
+        /* ========== 頁碼徽章 ========== */
+        .page-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #ff6b6b, #ffa726);
+            color: white;
+            padding: 0.4rem 1rem;
+            border-radius: 2rem;
+            font-size: 0.85rem;
+            font-weight: bold;
+            margin-top: 1.5rem;
+            box-shadow: 0 2px 8px rgba(255,107,107,0.3);
+        }
+
+        /* ========== 響應式設計 ========== */
+        @media screen and (max-width: 1280px) {
+            .banner.style1 .content,
+            .spotlight.style1 .content {
+                width: 60% !important;
+            }
+
+            .banner.style1 .image,
+            .spotlight.style1 .image {
+                width: 40% !important;
+            }
+        }
+
+        @media screen and (max-width: 736px) {
+            .content-block,
+            .hos-block,
+            .nos-block {
+                padding: 1.5rem;
+            }
+
+            .banner.style1 .content,
+            .banner.style1 .image,
+            .spotlight.style1 .content,
+            .spotlight.style1 .image {
+                width: 100% !important;
+            }
+        }
+
+        /* ========== 內容樣式優化 ========== */
+        .module-section {
+            margin-bottom: 0;
+        }
+
+        .content-block h3,
+        .hos-block h3,
+        .nos-block h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: #333;
+        }
+
+        .content-block ul,
+        .hos-block ul,
+        .nos-block ul {
+            margin-left: 1.5rem;
+            line-height: 1.8;
+        }
+
+        .content-block li,
+        .hos-block li,
+        .nos-block li {
+            margin-bottom: 1rem;
+        }
+
+        .content-block strong,
+        .hos-block strong,
+        .nos-block strong {
+            color: #ff6b6b;
+        }
+
+        /* ========== 導航按鈕強化 ========== */
+        .nav-buttons {
+            text-align: center;
+            padding: 2rem 0;
+        }
+
+        .nav-buttons .button {
+            font-size: 1.1rem;
+            padding: 0.8rem 2rem;
+        }
+    </style>
+</head>
+<body class="is-preload">
+
+    <!-- 滾動進度條 -->
+    <div class="progress-bar">
+        <div class="progress"></div>
+    </div>
+
+    <!-- Wrapper -->
+    <div id="wrapper" class="divided">
+
+        <!-- ========== Banner 封面 ========== -->
+        <section class="banner style1 orient-left content-align-left image-position-center fullscreen onload-image-fade-in onload-content-fade-right">
+            <div class="content">
+                <h1>The Geocentric-Heliocentric Revolution</h1>
+                <p class="major">從地心說到日心說的革命</p>
+                <h2>Overall Course Objectives 課程總目標</h2>
+                <ul>
+                    <li><strong>Content (科學知識):</strong> Describe the main components of the Ptolemaic (Geocentric) and Copernican (Heliocentric) models and explain why the phases of Venus served as critical falsifying evidence against the Ptolemaic system.<br>
+                    描述托勒密（地心說）和哥白尼（日心說）模型的主要內容，並解釋為什麼金星盈虧成為證偽托勒密系統的關鍵證據。</li>
+
+                    <li><strong>HOS (科學史):</strong> Recognize the historical roles and contributions of key figures such as Ptolemy, Copernicus, Tycho Brahe, and Galileo in this paradigm shift.<br>
+                    認識托勒密、哥白尼、第谷和伽利略等關鍵人物在這場典範轉移中的歷史角色與貢獻。</li>
+
+                    <li><strong>NOS (科學本質):</strong> Appreciate that scientific knowledge is tentative (changeable), empirically based, socio-culturally embedded, and involves human creativity. They will also be able to distinguish between scientific observation and inference.<br>
+                    體認科學知識是可變動的 (tentative)、植基於經驗證據 (empirically based)、受社會文化影響 (socio-culturally embedded)，並包含人類的創造力。學生也將能區分「科學觀察」與「科學推論」。</li>
+                </ul>
+                <ul class="actions stacked">
+                    <li><a href="#module1" class="button big wide smooth-scroll-middle">開始探索 Start Exploring</a></li>
+                </ul>
+                <span class="page-badge">Page 1</span>
+            </div>
+            <div class="image">
+                <img src="geocentric.webp" alt="Geocentric Model" />
+            </div>
+        </section>
+
+        <!-- ========== Module 1: The Perfect Universe (地心說模型) ========== -->
+        <section id="module1" class="spotlight style1 orient-right content-align-left image-position-center onscroll-image-fade-in">
+            <div class="content">
+                <h2>Module 1: The Perfect Universe</h2>
+                <p class="major">地心說模型 The Geocentric Model</p>
+                <p>For over 1,400 years, the Ptolemaic model dominated Western astronomical thought, perfectly aligned with the prevailing philosophical and theological worldview.</p>
+                <p>超過 1400 年間，托勒密模型主導了西方天文學思想，與當時的哲學和神學世界觀完美契合。</p>
+            </div>
+            <div class="image">
+                <img src="geocentric.webp" alt="The Geocentric Model" />
+            </div>
+        </section>
+
+        <!-- Module 1: Content Block -->
+        <section class="wrapper style1 align-center module-section">
+            <div class="inner content-block">
+                <h3>Content 科學知識</h3>
+                <ul>
+                    <li><strong>The Ptolemaic Model:</strong> Introduction to "deferents" and "epicycles" as the mechanisms used to explain the observation of retrograde motion.</li>
+                    <li><strong>托勒密模型：</strong> 介紹「均輪」(deferents) 與「本輪」(epicycles) 如何被用來「解釋」行星逆行 (retrograde motion) 的「觀測結果」。</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Module 1: HOS Block -->
+        <section class="wrapper style1 align-center module-section">
+            <div class="inner hos-block">
+                <h3>HOS 科學史</h3>
+                <ul>
+                    <li><strong>Historical Context:</strong> Why did the Ptolemaic model dominate Western thought for over 1,400 years?</li>
+                    <li><strong>歷史背景：</strong> 為什麼托勒密模型能主導西方思想超過 1400 年？</li>
+                    <li><strong>Philosophical Alignment:</strong> The model aligned perfectly with prevailing theological and philosophical views (i.e., the special, central place of Earth and humanity).</li>
+                    <li><strong>哲學契合：</strong> 該模型與當時主流的神學和哲學觀點（即地球和人類的特殊、中心地位）完美契合。</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Module 1: NOS Block -->
+        <section class="wrapper style1 align-center module-section">
+            <div class="inner nos-block">
+                <h3>NOS 科學本質</h3>
+                <ul>
+                    <li><strong>The Function of a Scientific Model:</strong> How can a "wrong" model be so successful? (It was predictively powerful for its time).</li>
+                    <li><strong>科學模型的功能：</strong> 一個「錯誤」的模型為何能如此成功？（它在當時具有「足夠強大」的預測能力）。</li>
+                    <li><strong>Science is Socio-Culturally Embedded:</strong> Scientific ideas are often accepted based on their fit with the dominant cultural framework.</li>
+                    <li><strong>科學受社會文化影響：</strong> 科學觀點的被接受，常取決於它們是否符合當時的主流文化框架。</li>
+                </ul>
+                <span class="page-badge">Page 2</span>
+            </div>
+        </section>
+
+        <!-- Navigation to Module 2 -->
+        <section class="wrapper style1 align-center nav-buttons">
+            <div class="inner">
+                <ul class="actions stacked">
+                    <li><a href="#module2" class="button big wide smooth-scroll-middle">下一模組：哥白尼的挑戰 Next: The Challenger</a></li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- ========== Module 2: The Challenger (哥白尼的日心說) ========== -->
+        <section id="module2" class="spotlight style1 orient-left content-align-left image-position-center onscroll-image-fade-in">
+            <div class="content">
+                <h2>The Challenger</h2>
+                <p class="major">哥白尼的日心說 The Copernican Model</p>
+                <p>Nicolaus Copernicus challenged centuries of astronomical tradition with a revolutionary idea: the Sun, not Earth, is at the center of the universe.</p>
+                <p>尼古拉·哥白尼以一個革命性的想法挑戰了數世紀的天文學傳統：太陽，而非地球，才是宇宙的中心。</p>
+            </div>
+            <div class="image">
+                <img src="heliocentric.png" alt="The Heliocentric Model" />
+            </div>
+        </section>
+
+        <!-- Module 2: Content Block -->
+        <section class="wrapper style1 align-center module-section">
+            <div class="inner content-block">
+                <h3>Content 科學知識</h3>
+                <ul>
+                    <li><strong>The Copernican (Heliocentric) Model:</strong> The Sun is at the center; Earth is one of several planets.</li>
+                    <li><strong>哥白尼（日心說）模型：</strong> 太陽位於中心；地球只是眾多行星之一。</li>
+                    <li><strong>A More "Elegant" Explanation:</strong> How the model explains retrograde motion more simply (as Earth "overtaking" outer planets) without complex epicycles.</li>
+                    <li><strong>更「簡潔」的解釋：</strong> 該模型如何更簡單地解釋逆行（地球「超越」運行較慢的外行星的結果），而不需要複雜的本輪。</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Module 2: HOS Block -->
+        <section class="wrapper style1 align-center module-section">
+            <div class="inner hos-block">
+                <h3>HOS 科學史</h3>
+                <ul>
+                    <li><strong>Copernicus's Motivation:</strong> He was driven by a philosophical desire for a more "elegant" and "harmonious" system, not by new data.</li>
+                    <li><strong>哥白尼的動機：</strong> 驅動他的是對一個更「簡潔」、「和諧」系統的哲學渴望，並非新的觀測數據。</li>
+                    <li><strong>Publication of De revolutionibus...:</strong> Why wait until his deathbed to publish (c. 1543)? Fear of ridicule and the intellectual climate.</li>
+                    <li><strong>《天體運行論》的出版：</strong> 為何等到臨終前才出版（約 1543 年）？對當時學術氛圍和潛在嘲笑的擔憂。</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Module 2: NOS Block -->
+        <section class="wrapper style1 align-center module-section">
+            <div class="inner nos-block">
+                <h3>NOS 科學本質</h3>
+                <ul>
+                    <li><strong>Scientific Creativity:</strong> Copernicus's model was an act of profound imagination and creativity, re-imagining the same data.</li>
+                    <li><strong>科學的創造力：</strong> 哥白尼的模型是一個深刻的「想像」與「創造」的行為，他只是用新的框架重新詮釋了相同的數據。</li>
+                    <li><strong>Simplicity:</strong> When two models explain the same data, scientists often prefer the simpler one.</li>
+                    <li><strong>簡潔性：</strong> 當兩個模型都能解釋相同的數據時，科學家傾向於選擇較簡單的那個。</li>
+                </ul>
+                <span class="page-badge">Page 3</span>
+            </div>
+        </section>
+
+        <!-- Navigation to Module 3 -->
+        <section class="wrapper style1 align-center nav-buttons">
+            <div class="inner">
+                <ul class="actions stacked">
+                    <li><a href="#module3" class="button big wide smooth-scroll-middle">下一模組：證據的累積 Next: The Evidence</a></li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- ========== Module 3: The Accumulation of Evidence (第谷與伽利略) ========== -->
+        <section id="module3" class="spotlight style1 orient-right content-align-left image-position-center onscroll-image-fade-in">
+            <div class="content">
+                <h2>The Accumulation of Evidence</h2>
+                <p class="major">第谷與伽利略 Tycho & Galileo</p>
+                <p>Two astronomers, separated by time but united in purpose, gathered the crucial evidence that would reshape our understanding of the cosmos.</p>
+                <p>兩位天文學家，雖處於不同時代，但目標一致，他們收集的關鍵證據重塑了我們對宇宙的理解。</p>
+            </div>
+            <div class="image">
+                <img src="venus.gif" alt="The Phases of Venus" />
+            </div>
+        </section>
+
+        <!-- Module 3: Content Block -->
+        <section class="wrapper style1 align-center module-section">
+            <div class="inner content-block">
+                <h3>Content 科學知識</h3>
+                <ul>
+                    <li><strong>Tycho Brahe:</strong> The master of pre-telescopic observation, producing the most accurate data set of his time.</li>
+                    <li><strong>第谷 (Tycho Brahe)：</strong> 望遠鏡發明前的觀測大師，產出了當時最精確的天文數據集。</li>
+                    <li><strong>Galileo's Telescopic Discoveries:</strong> (1) The Moon's surface (imperfect), (2) Sunspots (imperfect Sun), (3) Moons of Jupiter, (4) Phases of Venus.</li>
+                    <li><strong>伽利略的望遠鏡四大發現：</strong> (1) 月球表面（不完美）, (2) 太陽黑子（太陽不完美）, (3) 木星的衛星, (4) 金星的盈虧。</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Module 3: HOS Block -->
+        <section class="wrapper style1 align-center module-section">
+            <div class="inner hos-block">
+                <h3>HOS 科學史</h3>
+                <ul>
+                    <li><strong>Tycho's Role:</strong> Ironically, the "data-gatherer" did not accept the Copernican model; he proposed his own (Tychonic) model.</li>
+                    <li><strong>第谷的角色：</strong> 諷刺的是，這位「數據收集者」並不接受哥白尼模型；他提出了自己的「第谷模型」（地日系統）。</li>
+                    <li><strong>Galileo the "Advocate":</strong> How Galileo used a new tool (the telescope) to gather new evidence and challenge the established order.</li>
+                    <li><strong>伽利略作為「倡議者」：</strong> 伽利略如何利用「望遠鏡」這個新工具來收集新證據，並挑戰既有權威。</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Module 3: NOS Block -->
+        <section class="wrapper style1 align-center module-section">
+            <div class="inner nos-block">
+                <h3>NOS 科學本質</h3>
+                <ul>
+                    <li><strong>Role of Technology:</strong> New technology (the telescope) can extend human senses and provide new empirical evidence previously inaccessible.</li>
+                    <li><strong>科技的角色：</strong> 新科技（望遠鏡）可以「延伸人類的感官」，並提供以前無法獲得的、新的「經驗證據」。</li>
+                    <li><strong>Observation vs. Inference (Key distinction):</strong>
+                        <ul>
+                            <li>Observation: "Galileo saw points of light near Jupiter."</li>
+                            <li>Inference: "He inferred they were moons."</li>
+                        </ul>
+                    </li>
+                    <li><strong>觀察 (Observation) vs. 推論 (Inference)（關鍵區別）：</strong>
+                        <ul>
+                            <li>觀察：「伽利略看到木星旁邊有幾個亮點。」</li>
+                            <li>推論：「他『推斷』這些是木星的衛星。」</li>
+                        </ul>
+                    </li>
+                </ul>
+                <span class="page-badge">Page 4</span>
+            </div>
+        </section>
+
+        <!-- Navigation to Module 4 -->
+        <section class="wrapper style1 align-center nav-buttons">
+            <div class="inner">
+                <ul class="actions stacked">
+                    <li><a href="#module4" class="button big wide smooth-scroll-middle">下一模組：科學對話 Next: The Dialogue</a></li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- ========== Module 4: The Dialogue (跨越年代的科學對話) ========== -->
+        <section id="module4" class="spotlight style1 orient-left content-align-left image-position-center onscroll-image-fade-in">
+            <div class="content">
+                <h2>The Dialogue</h2>
+                <p class="major">跨越年代的科學對話</p>
+                <p>A pivotal moment in the history of science: when observation met theory, and evidence decided between competing worldviews.</p>
+                <p>科學史上的關鍵時刻：當觀察遇見理論，證據決定了相互競爭的世界觀。</p>
+            </div>
+            <div class="image">
+                <img src="dialogue.png" alt="Scientific Dialogue Across Time" />
+            </div>
+        </section>
+
+        <!-- Module 4: Content Block -->
+        <section class="wrapper style1 align-center module-section">
+            <div class="inner content-block">
+                <h3>Content 科學知識</h3>
+                <ul>
+                    <li><strong>CORE ACTIVITY: Modeling and Prediction</strong></li>
+                    <li><strong>Prediction from Ptolemaic Model:</strong> Venus is locked between Earth and Sun. Conclusion: It would never show a "gibbous" or "full" phase.</li>
+                    <li><strong>托勒密模型的預測：</strong> 金星被鎖定在地球和太陽之間。結論： 地球上「永遠」不可能看到「盈凸月」或「滿月」相位的金星。</li>
+                    <li><strong>Prediction from Copernican Model:</strong> Venus orbits the Sun. Conclusion: It will show a full set of phases (crescent, gibbous, full).</li>
+                    <li><strong>哥白尼模型的預測：</strong> 金星繞著太陽轉。結論： 地球上將能看到金星「完整的盈虧相位」（包含眉月、盈凸月、滿月）。</li>
+                    <li><strong>The Decisive Evidence:</strong> Galileo observed the full set of phases.</li>
+                    <li><strong>決定性的證據：</strong> 伽利略「觀測」到了完整的金星盈虧相位。</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Module 4: HOS Block -->
+        <section class="wrapper style1 align-center module-section">
+            <div class="inner hos-block">
+                <h3>HOS 科學史</h3>
+                <ul>
+                    <li>This discovery was Galileo's "smoking gun" — the most powerful visual evidence against the Ptolemaic system.</li>
+                    <li>這項發現是伽利略的「冒煙的槍」（確鑿證據）——反對托勒密系統的最有力視覺證據。</li>
+                    <li>Featured heavily in his <em>Dialogue Concerning the Two Chief World Systems</em>.</li>
+                    <li>這項證據在他的著作《關於兩大世界體系的對話》中佔有重要份量。</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Module 4: NOS Block -->
+        <section class="wrapper style1 align-center module-section">
+            <div class="inner nos-block">
+                <h3>NOS 科學本質</h3>
+                <ul>
+                    <li><strong>Falsifiability (Core NOS Concept):</strong> Galileo's observation did NOT "prove" the Copernican model was correct (Tycho's model could also explain it).</li>
+                    <li><strong>證偽性 (Falsifiability)（本模組核心 NOS 概念）：</strong> 伽利略的觀察並未「證明」哥白尼模型是對的（因為第谷模型也能解釋金星盈虧）。</li>
+                    <li>However, it decisively "falsified" (disproved) the Ptolemaic model.</li>
+                    <li>然而，它決定性地「證偽」了托勒密模型。</li>
+                    <li><strong>Power and Limits of Evidence:</strong> Science progresses by disproving old models.</li>
+                    <li><strong>證據的力量與局限：</strong> 科學的進展常常是透過「證偽」舊模型來達成的。</li>
+                </ul>
+                <span class="page-badge">Page 5</span>
+            </div>
+        </section>
+
+        <!-- Final Summary Section -->
+        <section class="wrapper style1 align-center">
+            <div class="inner">
+                <h2>Conclusion 結語</h2>
+                <p>The transition from the geocentric to the heliocentric model represents one of the most profound paradigm shifts in the history of science. This revolution was not merely about astronomical observations; it fundamentally changed how we understand our place in the universe and the nature of scientific knowledge itself.</p>
+                <p>從地心說到日心說的轉變代表了科學史上最深刻的典範轉移之一。這場革命不僅僅關乎天文觀測；它從根本上改變了我們對宇宙中人類位置的理解，以及科學知識本質的認知。</p>
+                <ul class="actions stacked">
+                    <li><a href="#wrapper" class="button big wide smooth-scroll">返回頂部 Back to Top</a></li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="wrapper style1 align-center">
+            <div class="inner">
+                <p>&copy; The Geocentric-Heliocentric Revolution. Design: <a href="https://html5up.net">HTML5 UP</a>.</p>
+            </div>
+        </footer>
+
+    </div>
+
+    <!-- 共用 JavaScript 資源 -->
+    <script src="../story-temp/assets/js/jquery.min.js"></script>
+    <script src="../story-temp/assets/js/jquery.scrollex.min.js"></script>
+    <script src="../story-temp/assets/js/jquery.scrolly.min.js"></script>
+    <script src="../story-temp/assets/js/browser.min.js"></script>
+    <script src="../story-temp/assets/js/breakpoints.min.js"></script>
+    <script src="../story-temp/assets/js/util.js"></script>
+    <script src="../story-temp/assets/js/main.js"></script>
+
+    <!-- 自訂 JavaScript -->
+    <script>
+        // 滾動進度計算
+        $(window).scroll(function() {
+            var scrolled = ($(window).scrollTop() / ($(document).height() - $(window).height())) * 100;
+            $('.progress').css('width', scrolled + '%');
+        });
+    </script>
+
+</body>
+</html>
