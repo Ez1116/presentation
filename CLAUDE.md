@@ -133,6 +133,315 @@
 </div>
 ```
 
+## 文字排版最佳實踐
+
+本節整理了參考 `inquiry-rule-presentation.html` 的優秀文字排版設計，確保每次製作簡報都能保持一致且專業的視覺效果。
+
+### 完整樣式模板
+
+在HTML檔案的 `<head>` 區塊中加入以下自訂樣式：
+
+```html
+<style>
+    /* 章節分頁效果 */
+    .slide-section {
+        min-height: 100vh;
+        padding: 2rem 0;
+        border-bottom: 2px solid #f4f4f4;
+    }
+
+    .slide-section:last-child {
+        border-bottom: none;
+    }
+
+    /* 數據數字樣式 - 用於重要統計數據 */
+    .stat-number {
+        font-size: 2em;
+        font-weight: bold;
+        color: #f56a6a;
+        margin: 0;
+    }
+
+    /* 強調框樣式 - 用於重要提醒和註記 */
+    .highlight-box {
+        background: #f7f7f7;
+        border-left: 4px solid #f56a6a;
+        padding: 1rem;
+        margin: 1rem 0;
+    }
+</style>
+```
+
+### 樣式使用說明
+
+#### 1. 數據數字樣式 (`.stat-number`)
+
+**設計規格：**
+- 字體大小：`2em`（是正常文字的2倍）
+- 字體粗細：`bold`（粗體）
+- 顏色：`#f56a6a`（紅色系）
+- 外距：`0`（無外距）
+
+**適用場景：**
+- 百分比數據（如：30%、40%）
+- 關鍵指標數字
+- 統計結果展示
+- 表格中的重要數據
+
+**使用範例：**
+```html
+<!-- 在表格中使用 -->
+<table>
+    <tbody>
+        <tr>
+            <td><strong>課堂表現</strong></td>
+            <td><span class="stat-number">30%</span></td>
+            <td>參與討論、提問、實驗操作等</td>
+        </tr>
+    </tbody>
+</table>
+
+<!-- 在Box元件中使用 -->
+<div class="box">
+    <h3>關鍵數據</h3>
+    <p class="stat-number">85%</p>
+    <p>成長率</p>
+</div>
+```
+
+#### 2. 強調框樣式 (`.highlight-box`)
+
+**設計規格：**
+- 背景色：`#f7f7f7`（淺灰色）
+- 左邊框：`4px solid #f56a6a`（紅色粗邊框）
+- 內距：`1rem`
+- 外距：`1rem 0`（上下各1rem）
+
+**適用場景：**
+- 重要註記事項
+- 課程規則說明
+- 小提醒、警告訊息
+- 需要特別注意的內容
+
+**使用範例：**
+```html
+<!-- 重要註記 -->
+<div class="highlight-box">
+    <h3>重要註記事項</h3>
+    <ul>
+        <li><strong>註一：</strong>各項計分方式，將於每次實作主題中再次提醒。</li>
+        <li><strong>註二：</strong>各項表單、紀錄，原則上當次課程結束前完成。</li>
+        <li><strong>註三：</strong>課程期間，請勿處理非本課程事務!!</li>
+    </ul>
+</div>
+
+<!-- 小提醒 -->
+<div class="highlight-box">
+    <h3><span class="icon solid fa-lightbulb"></span> 小提醒</h3>
+    <p>遵守以上規則，不僅能避免扣分，更能創造良好的學習環境。</p>
+</div>
+```
+
+#### 3. 章節分頁樣式 (`.slide-section`)
+
+**設計規格：**
+- 最小高度：`100vh`（占滿整個螢幕高度）
+- 內距：`2rem 0`（上下各2rem）
+- 下邊框：`2px solid #f4f4f4`（淡灰色分隔線）
+- 最後一個章節無下邊框
+
+**適用場景：**
+- 每個主要章節
+- 需要分頁效果的內容區塊
+- 簡報各大主題分隔
+
+**使用範例：**
+```html
+<!-- 計分方式章節 -->
+<section id="scoring" class="slide-section">
+    <header class="major">
+        <h2><span class="icon solid fa-chart-bar"></span> 計分方式</h2>
+    </header>
+    <!-- 章節內容 -->
+</section>
+
+<!-- 請假問題章節 -->
+<section id="absence" class="slide-section">
+    <header class="major">
+        <h2><span class="icon solid fa-calendar-times"></span> 請假問題</h2>
+    </header>
+    <!-- 章節內容 -->
+</section>
+```
+
+### HTML標籤使用規範
+
+#### 1. 標題層級標準
+
+**h1 標題（主標題）**
+- 用途：簡報封面的主標題
+- 出現位置：Banner區域
+- 每個簡報僅使用一次
+- 範例：`<h1>自然探究與實作探究入門</h1>`
+
+**h2 標題（章節標題）**
+- 用途：各大章節的標題
+- 搭配：`class="major"` 增強視覺效果
+- 可加入圖示增加辨識度
+- 範例：`<h2><span class="icon solid fa-chart-bar"></span> 計分方式</h2>`
+
+**h3 標題（小節標題）**
+- 用途：章節內的子主題
+- 位置：列表項目、Box內容、Features網格等
+- 範例：`<h3>通知義務</h3>`、`<h3>重要註記事項</h3>`
+
+#### 2. 文字強調方式
+
+**粗體強調 (`<strong>`)**
+- 用於重要欄位名稱
+- 用於關鍵規則說明
+- 用於需要特別注意的內容
+- 範例：`<strong>課堂表現</strong>`、`<strong>若課程有請假，請寫信通知老師</strong>`
+
+**斜體說明 (`<em>`)**
+- 用於次要說明文字
+- 用於補充資訊
+- 範例：`<em>(若有疑問，先問同組同學、再問任課老師)</em>`
+
+**組合使用**
+```html
+<p><strong>若是當週作業，請於下次上課前補完作業</strong></p>
+<p><strong>請自行補作課程規定作業 (加註當日請○○假)。</strong><br />
+<em>(若有疑問，先問同組同學、再問任課老師)</em></p>
+```
+
+#### 3. 表格內的文字處理
+
+**標準表格結構**
+```html
+<div class="table-wrapper">
+    <table>
+        <thead>
+            <tr>
+                <th>計分項目</th>
+                <th>佔比</th>
+                <th>細節</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>課堂表現</strong></td>
+                <td><span class="stat-number">30%</span></td>
+                <td>參與討論、提問、實驗操作/考試、課程出缺席等</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+```
+
+**表格文字規範：**
+- 表頭 (`<th>`)：使用模板預設樣式，無需額外設定
+- 重要欄位：使用 `<strong>` 標籤
+- 數據欄位：使用 `.stat-number` 類別
+- 說明欄位：使用正常段落文字
+
+### 完整範例：綜合應用
+
+以下是一個完整的章節範例，展示如何綜合運用以上所有排版技巧：
+
+```html
+<section id="scoring" class="slide-section">
+    <header class="major">
+        <h2><span class="icon solid fa-chart-bar"></span> 計分方式</h2>
+    </header>
+
+    <!-- 數據表格 -->
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th>計分項目</th>
+                    <th>佔比</th>
+                    <th>細節</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>課堂表現</strong></td>
+                    <td><span class="stat-number">30%</span></td>
+                    <td>參與討論、提問、實驗操作/考試、課程出缺席等</td>
+                </tr>
+                <tr>
+                    <td><strong>實驗相關紀錄</strong></td>
+                    <td><span class="stat-number">40%</span></td>
+                    <td>科學筆記、實驗學習單、實驗書面報告等</td>
+                </tr>
+                <tr>
+                    <td><strong>簡報與分享能力</strong></td>
+                    <td><span class="stat-number">30%</span></td>
+                    <td>簡報製作、上臺發表、同儕評鑑等</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- 重要註記框 -->
+    <div class="highlight-box">
+        <h3>重要註記事項</h3>
+        <ul>
+            <li><strong>註一：</strong>各項計分方式，將於每次實作主題中再次提醒。</li>
+            <li><strong>註二：</strong>各項表單、紀錄，原則上當次課程結束前完成；或於下次上課前交回、不補交。</li>
+            <li><strong>註三：</strong>課程期間，請勿處理非本課程事務!! (無論做完與否!!)</li>
+        </ul>
+    </div>
+</section>
+```
+
+### 排版檢查清單
+
+製作簡報時，請確認以下事項：
+
+**CSS樣式檢查**
+- [ ] 已在 `<head>` 中加入完整的自訂樣式
+- [ ] `.stat-number` 樣式設定正確（2em、粗體、紅色）
+- [ ] `.highlight-box` 樣式設定正確（灰底、紅色左邊框）
+- [ ] `.slide-section` 樣式設定正確（100vh、分隔線）
+
+**HTML結構檢查**
+- [ ] 每個主要章節使用 `.slide-section` 類別
+- [ ] 章節標題使用 `<h2 class="major">`
+- [ ] 重要數據使用 `.stat-number` 類別
+- [ ] 註記事項使用 `.highlight-box` 包裹
+
+**文字標記檢查**
+- [ ] 重要欄位使用 `<strong>` 標籤
+- [ ] 次要說明使用 `<em>` 標籤
+- [ ] 表格結構使用 `<div class="table-wrapper">` 包裹
+- [ ] 圖示搭配標題適當使用
+
+**視覺效果檢查**
+- [ ] 數據數字醒目易讀
+- [ ] 強調框視覺層次分明
+- [ ] 章節分隔清晰
+- [ ] 整體排版一致協調
+
+### 色彩使用建議
+
+基於 inquiry-rule-presentation.html 的配色方案：
+
+**主要色彩：**
+- 強調色：`#f56a6a`（紅色系）- 用於數據、邊框、圖示
+- 背景色：`#f7f7f7`（淺灰色）- 用於強調框背景
+- 分隔線：`#f4f4f4`（更淡的灰色）- 用於章節分隔
+
+**使用原則：**
+- 重要數據使用紅色強調
+- 背景使用淡色系不搶眼
+- 保持色彩一致性
+- 避免過多色彩造成視覺混亂
+
+這些排版最佳實踐確保了簡報的專業性、可讀性和視覺一致性，是製作高品質HTML簡報的關鍵要素。
+
 ## 互動功能增強
 
 ### 1. 平滑滾動導航
