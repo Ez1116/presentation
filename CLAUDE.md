@@ -88,54 +88,281 @@
 </div>
 ```
 
-## 簡報專用樣式自定義
+## 側邊欄架構設計
 
-### 1. 創建簡報導航
-在側邊欄menu區域添加簡報章節導航：
+基於 `nos-presentation.html` 的優秀設計，本節提供完整的側邊欄架構範本和最佳實踐。
+
+### 1. 完整側邊欄結構範本
+
+側邊欄應包含四個主要區塊，提供清晰的導航和資訊架構：
+
+```html
+<!-- Sidebar -->
+<div id="sidebar">
+    <div class="inner">
+
+        <!-- 區塊一：導航選單 -->
+        <nav id="menu">
+            <header class="major">
+                <h2>Navigation</h2>
+            </header>
+            <ul>
+                <li><a href="#banner">Cover / Page 1</a></li>
+                <li><a href="#page-2">Introduction / Page 2</a></li>
+                <li><a href="#page-3">Analysis / Page 3</a></li>
+                <li><a href="#page-4">Conclusion / Page 4</a></li>
+                <!-- 根據簡報章節添加更多導航項目 -->
+            </ul>
+        </nav>
+
+        <!-- 區塊二：簡報說明 (About Section) -->
+        <section>
+            <header class="major">
+                <h2>About This Presentation</h2>
+            </header>
+            <div class="mini-posts">
+                <article>
+                    <p>簡報的簡短說明，介紹主題、作者或背景資訊。</p>
+                </article>
+            </div>
+            <ul class="actions">
+                <li><a href="#key-section" class="button">View Key Section</a></li>
+            </ul>
+        </section>
+
+        <!-- 區塊三：關鍵概念 (Key Concepts) -->
+        <section>
+            <header class="major">
+                <h2>Key Concepts</h2>
+            </header>
+            <ul class="contact">
+                <li class="icon solid fa-flask"><strong>概念一</strong> - 說明</li>
+                <li class="icon solid fa-atom"><strong>概念二</strong> - 說明</li>
+                <li class="icon solid fa-chart-bar"><strong>概念三</strong> - 說明</li>
+                <li class="icon solid fa-globe"><strong>概念四</strong> - 說明</li>
+            </ul>
+        </section>
+
+        <!-- 區塊四：頁尾版權 -->
+        <footer id="footer">
+            <p class="copyright">&copy; Presentation. All rights reserved. Design: <a href="https://html5up.net">HTML5 UP</a>.</p>
+        </footer>
+
+    </div>
+</div>
+```
+
+### 2. 側邊欄切換功能實作
+
+為了提供更好的使用者體驗，建議加入側邊欄切換功能，讓使用者可以隱藏/顯示側邊欄。
+
+#### 在 HTML `<head>` 區塊中加入 CSS 樣式：
+
+```html
+<style>
+    /* ========== 側邊欄切換功能 ========== */
+
+    /* 切換按鈕樣式 - 固定在頁面左上角 */
+    .sidebar-toggle {
+        position: fixed;
+        left: 1rem;
+        top: 1rem;
+        width: 1.5rem;
+        height: 1.5rem;
+        background: #475a6c;
+        border-radius: 0.375em;
+        color: white !important;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 10001;
+        transition: background 0.2s ease, transform 0.2s ease;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        text-decoration: none !important;
+    }
+
+    .sidebar-toggle:hover {
+        background: #3d4449;
+        transform: scale(1.05);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+
+    .sidebar-toggle .icon {
+        font-size: 1.25rem;
+    }
+
+    /* 側邊欄平滑過渡動畫 */
+    #sidebar {
+        transition: margin-left 0.35s ease;
+    }
+
+    /* 支援大螢幕切換 - 覆蓋模板預設行為 */
+    @media screen and (min-width: 1281px) {
+        #sidebar.inactive {
+            margin-left: -26em;
+        }
+    }
+
+    /* 主內容區域平滑過渡 */
+    #main {
+        transition: margin-left 0.35s ease;
+    }
+
+    /* 小螢幕優化 - 按鈕顏色更醒目 */
+    @media screen and (max-width: 1280px) {
+        .sidebar-toggle {
+            background: #f56a6a;
+        }
+
+        .sidebar-toggle:hover {
+            background: #f44336;
+        }
+    }
+</style>
+```
+
+#### 在 Header 區域加入切換按鈕：
+
+```html
+<!-- Header -->
+<header id="header">
+    <a href="#sidebar" class="sidebar-toggle" title="切換側邊欄">
+        <span class="icon solid fa-bars"></span>
+    </a>
+    <a href="index.html" class="logo"><strong>Your Name</strong> Presentation</a>
+    <ul class="icons">
+        <li><a href="#" class="icon brands fa-twitter"><span class="label">Twitter</span></a></li>
+        <li><a href="#" class="icon solid fa-envelope"><span class="label">Email</span></a></li>
+    </ul>
+</header>
+```
+
+#### 在 HTML 結尾加入 JavaScript 切換邏輯：
+
+```html
+<!-- 側邊欄切換功能 -->
+<script>
+    $(document).ready(function() {
+        // 綁定切換按鈕點擊事件
+        $('.sidebar-toggle').on('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            // 切換側邊欄的 inactive 類
+            $('#sidebar').toggleClass('inactive');
+
+            // 切換 body 的類（用於內容區域調整）
+            $('body').toggleClass('sidebar-inactive');
+        });
+    });
+</script>
+```
+
+### 3. 側邊欄區塊類型說明
+
+#### **導航選單 (Navigation Menu)**
+- **用途：** 提供快速跳轉到各章節的連結
+- **建議：**
+  - 使用 `href="#section-id"` 對應到各章節的 id
+  - 可加入頁碼標示（如：Page 1, Page 2）增加清晰度
+  - 保持項目名稱簡潔（建議 3-5 個字）
+
+**範例：**
 ```html
 <nav id="menu">
     <header class="major">
         <h2>簡報大綱</h2>
     </header>
     <ul>
-        <li><a href="#intro">介紹</a></li>
-        <li><a href="#analysis">分析</a></li>
-        <li><a href="#conclusion">結論</a></li>
+        <li><a href="#banner">封面 / 第 1 頁</a></li>
+        <li><a href="#intro">介紹 / 第 2 頁</a></li>
+        <li><a href="#analysis">分析 / 第 3 頁</a></li>
+        <li><a href="#conclusion">結論 / 第 4 頁</a></li>
     </ul>
 </nav>
 ```
 
-### 2. 章節分頁效果
-添加CSS實現分頁效果：
-```css
-.slide-section {
-    min-height: 100vh;
-    padding: 2rem 0;
-    border-bottom: 2px solid #f4f4f4;
-}
+#### **簡報說明區塊 (About Section)**
+- **用途：** 提供簡報背景資訊、作者介紹或主題說明
+- **建議：**
+  - 使用 `mini-posts` 格式保持簡潔
+  - 可加入行動按鈕 (Call-to-Action) 引導至重點章節
 
-.slide-section:last-child {
-    border-bottom: none;
-}
-```
-
-### 3. 圖表和數據視覺化
+**範例：**
 ```html
-<!-- 數據展示區域 -->
-<div class="row">
-    <div class="col-6 col-12-medium">
-        <div class="box">
-            <h3>關鍵數據</h3>
-            <p class="stat-number">85%</p>
-            <p>成長率</p>
-        </div>
+<section>
+    <header class="major">
+        <h2>關於本簡報</h2>
+    </header>
+    <div class="mini-posts">
+        <article>
+            <p>本簡報探討<strong>主題</strong>，分析其在<strong>領域</strong>中的應用與影響。</p>
+        </article>
     </div>
-</div>
+    <ul class="actions">
+        <li><a href="#key-findings" class="button">查看重點發現</a></li>
+    </ul>
+</section>
 ```
 
-## 文字排版最佳實踐
+#### **關鍵概念區塊 (Key Concepts)**
+- **用途：** 列出簡報中的重要術語、縮寫或核心概念
+- **建議：**
+  - 使用 `contact` 類別配合 FontAwesome 圖示
+  - 每個概念包含術語和簡短定義
+  - 圖示選擇應與概念內容相關
 
-本節整理了參考 `inquiry-rule-presentation.html` 的優秀文字排版設計，確保每次製作簡報都能保持一致且專業的視覺效果。
+**範例：**
+```html
+<section>
+    <header class="major">
+        <h2>關鍵術語</h2>
+    </header>
+    <ul class="contact">
+        <li class="icon solid fa-atom"><strong>AI</strong> - Artificial Intelligence 人工智慧</li>
+        <li class="icon solid fa-brain"><strong>ML</strong> - Machine Learning 機器學習</li>
+        <li class="icon solid fa-network-wired"><strong>DL</strong> - Deep Learning 深度學習</li>
+        <li class="icon solid fa-database"><strong>Big Data</strong> - 大數據分析技術</li>
+    </ul>
+</section>
+```
+
+#### **頁尾版權 (Footer)**
+- **用途：** 顯示版權聲明、設計來源或授權資訊
+- **建議：** 保持簡潔，提供必要的法律聲明即可
+
+**範例：**
+```html
+<footer id="footer">
+    <p class="copyright">&copy; 2024 Your Name. All rights reserved. Design: <a href="https://html5up.net">HTML5 UP</a>.</p>
+</footer>
+```
+
+### 4. 客製化建議與最佳實踐
+
+#### **根據簡報類型調整側邊欄**
+
+**學術簡報：**
+- 強調導航選單和關鍵術語
+- 加入文獻引用或資料來源區塊
+
+**商業簡報：**
+- 突出關鍵指標和數據
+- 加入聯絡資訊或行動呼籲按鈕
+
+**教學簡報：**
+- 清晰的課程大綱導航
+- 加入學習目標或重點摘要
+
+#### **視覺一致性建議**
+- 側邊欄標題使用 `<h2>` 配合 `class="major"`
+- 圖示顏色與簡報主題色調協調
+- 保持各區塊間距一致（使用預設的 section 間距）
+
+#### **響應式設計考量**
+- Editorial 模板已內建響應式設計
+- 小螢幕（手機）時側邊欄自動隱藏，可透過切換按鈕開啟
+- 確保切換按鈕在所有螢幕尺寸都清晰可見
 
 ### 完整樣式模板
 
@@ -147,7 +374,7 @@
     .slide-section {
         min-height: 100vh;
         padding: 2rem 0;
-        border-bottom: 2px solid #f4f4f4;
+        border-bottom: 2px solid #e5eaed;
     }
 
     .slide-section:last-child {
@@ -158,16 +385,23 @@
     .stat-number {
         font-size: 2em;
         font-weight: bold;
-        color: #f56a6a;
+        color: #475a6c;
         margin: 0;
     }
 
     /* 強調框樣式 - 用於重要提醒和註記 */
     .highlight-box {
-        background: #f7f7f7;
-        border-left: 4px solid #f56a6a;
+        background: #f0f4f7;
+        border-left: 4px solid #475a6c;
         padding: 1rem;
         margin: 1rem 0;
+    }
+
+    /* 螢光筆標記效果 - 用於強調重點詞彙 */
+    .highlight {
+        background: linear-gradient(transparent 60%, #d8c690 60%);
+        font-weight: 500;
+        padding: 0 2px;
     }
 </style>
 ```
@@ -179,7 +413,7 @@
 **設計規格：**
 - 字體大小：`2em`（是正常文字的2倍）
 - 字體粗細：`bold`（粗體）
-- 顏色：`#f56a6a`（紅色系）
+- 顏色：`#475a6c`（深藍灰色）
 - 外距：`0`（無外距）
 
 **適用場景：**
@@ -212,8 +446,8 @@
 #### 2. 強調框樣式 (`.highlight-box`)
 
 **設計規格：**
-- 背景色：`#f7f7f7`（淺灰色）
-- 左邊框：`4px solid #f56a6a`（紅色粗邊框）
+- 背景色：`#f0f4f7`（淡藍灰色）
+- 左邊框：`4px solid #475a6c`（深藍灰色粗邊框）
 - 內距：`1rem`
 - 外距：`1rem 0`（上下各1rem）
 
@@ -242,12 +476,48 @@
 </div>
 ```
 
-#### 3. 章節分頁樣式 (`.slide-section`)
+#### 3. 螢光筆標記樣式 (`.highlight`)
+
+**設計規格：**
+- 背景效果：`linear-gradient(transparent 60%, #d8c690 60%)`（金黃色漸層螢光筆效果）
+- 字體粗細：`500`（半粗體）
+- 內距：`0 2px`（左右各2px）
+
+**適用場景：**
+- 標記課程標準代碼（如：EIa-Vc-1）
+- 強調重要專有名詞
+- 突出關鍵概念和術語
+- 醒目標示需要特別注意的文字
+- 標記定義或重要規則
+
+**使用範例：**
+```html
+<!-- 標記專有名詞 -->
+<p>科學家曾經提出<span class="highlight">大陸漂移</span>、<span class="highlight">海底擴張</span>及<span class="highlight">板塊構造</span>等主要學說。</p>
+
+<!-- 標記課程代碼 -->
+<p><span class="highlight">EIa-Vc-1</span> 科學家曾經提出大陸漂移、海底擴張及板塊構造等主要學說，來解釋變動中的固體地球。</p>
+
+<!-- 標記關鍵概念 -->
+<p>板塊邊界可分為<span class="highlight">聚合</span>、<span class="highlight">張裂</span>及<span class="highlight">錯動</span>三大類型。</p>
+
+<!-- 在表格中使用 -->
+<table>
+    <tbody>
+        <tr>
+            <td><span class="highlight">觀察現象</span></td>
+            <td>從日常經驗進行多方觀察</td>
+        </tr>
+    </tbody>
+</table>
+```
+
+#### 4. 章節分頁樣式 (`.slide-section`)
 
 **設計規格：**
 - 最小高度：`100vh`（占滿整個螢幕高度）
 - 內距：`2rem 0`（上下各2rem）
-- 下邊框：`2px solid #f4f4f4`（淡灰色分隔線）
+- 下邊框：`2px solid #e5eaed`（淡藍灰色分隔線）
 - 最後一個章節無下邊框
 
 **適用場景：**
@@ -403,9 +673,10 @@
 
 **CSS樣式檢查**
 - [ ] 已在 `<head>` 中加入完整的自訂樣式
-- [ ] `.stat-number` 樣式設定正確（2em、粗體、紅色）
-- [ ] `.highlight-box` 樣式設定正確（灰底、紅色左邊框）
-- [ ] `.slide-section` 樣式設定正確（100vh、分隔線）
+- [ ] `.stat-number` 樣式設定正確（2em、粗體、深藍灰色）
+- [ ] `.highlight-box` 樣式設定正確（淡藍灰底、深藍灰色左邊框）
+- [ ] `.highlight` 樣式設定正確（金黃色漸層、font-weight 500）
+- [ ] `.slide-section` 樣式設定正確（100vh、淡藍灰色分隔線）
 
 **HTML結構檢查**
 - [ ] 每個主要章節使用 `.slide-section` 類別
@@ -427,17 +698,18 @@
 
 ### 色彩使用建議
 
-基於 inquiry-rule-presentation.html 的配色方案：
+基於專業簡報的配色方案：
 
 **主要色彩：**
-- 強調色：`#f56a6a`（紅色系）- 用於數據、邊框、圖示
-- 背景色：`#f7f7f7`（淺灰色）- 用於強調框背景
-- 分隔線：`#f4f4f4`（更淡的灰色）- 用於章節分隔
+- 強調色：`#475a6c`（深藍灰色）- 用於數據、邊框、圖示
+- 背景色：`#f0f4f7`（淡藍灰色）- 用於強調框背景
+- 分隔線：`#e5eaed`（淡藍灰色）- 用於章節分隔
+- 螢光筆色：`#d8c690`（金黃色）- 用於標記重點詞彙、關鍵術語、課程代碼
 
 **使用原則：**
-- 重要數據使用紅色強調
-- 背景使用淡色系不搶眼
-- 保持色彩一致性
+- 重要數據使用深藍灰色強調，呈現專業沉穩感
+- 背景使用淡藍灰色系，協調且不搶眼
+- 保持色彩一致性，營造整體商務氛圍
 - 避免過多色彩造成視覺混亂
 
 這些排版最佳實踐確保了簡報的專業性、可讀性和視覺一致性，是製作高品質HTML簡報的關鍵要素。
