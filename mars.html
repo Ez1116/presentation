@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>火星逆行：從地心說到日心說</title>
+    <style>
+        :root {
+            --bg-color: #050505;
+            --panel-color: #1a1a1a;
+            --accent-color: #4cc9f0;
+            --mars-color: #ff4d4d;
+            --retro-color: #00ff88; /* 亮綠色 */
+            --earth-color: #4d79ff;
+            --sun-color: #ffd700;
+            --text-color: #e0e0e0;
+        }
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+        h1 { margin-bottom: 5px; font-weight: 300; letter-spacing: 1px; }
+        .subtitle { color: #888; margin-bottom: 20px; font-size: 0.9rem; }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            background: var(--panel-color);
+            padding: 5px;
+            border-radius: 30px;
+        }
+        .tab-btn {
+            background: transparent;
+            border: none;
+            color: #888;
+            padding: 10px 25px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        .tab-btn.active {
+            background: var(--accent-color);
+            color: #000;
+        }
+        .tab-btn:hover:not(.active) { color: #fff; }
+
+        /* Canvas Container */
+        .canvas-container {
+            position: relative;
+            box-shadow: 0 0 30px rgba(0,0,0,0.8);
+            border-radius: 12px;
+            overflow: hidden;
+            background: #0e0e12;
+        }
+        canvas { display: block; }
+        
+        /* Overlay Info */
+        .info-panel {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 15px;
+            border-radius: 8px;
+            max-width: 250px;
+            border-left: 3px solid var(--accent-color);
+            pointer-events: none;
+        }
+        .info-title { font-weight: bold; color: #fff; margin-bottom: 5px; }
+        .info-desc { font-size: 0.85rem; color: #ccc; line-height: 1.4; }
+
+        /* Legend */
+        .legend {
+            margin-top: 15px;
+            display: flex;
+            gap: 20px;
+            font-size: 0.85rem;
+        }
+        .dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; margin-right: 5px; }
+
+        /* Controls */
+        .controls {
+            margin-top: 20px;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+        button.ctrl-btn {
+            padding: 8px 16px;
+            background: #333;
+            border: 1px solid #555;
+            color: white;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button.ctrl-btn:hover { background: #444; }
+        input[type="range"] { accent-color: var(--accent-color); }
+
+    </style>
+</head>
+<body>
+
+    <h1>火星逆行 (Mars Retrograde)</h1>
+    <div class="subtitle">天文學演變史視覺化</div>
+
+    <div class="tabs">
+        <button class="tab-btn active" onclick="setMode('geocentric')">1. 地心說 (本輪均輪)</button>
+        <button class="tab-btn" onclick="setMode('heliocentric')">2. 日心說 (軌道超車)</button>
+    </div>
+
+    <div class="canvas-container">
+        <canvas id="mainCanvas" width="800" height="500"></canvas>
+        
+        <div class="info-panel" id="infoPanel">
+            <div class="info-title" id="infoTitle">視角模式</div>
+            <div class="info-desc" id="infoDesc">說明文字</div>
+        </div>
+    </div>
+
+    <div class="legend" id="legend">
+    </div>
+
+    <div class="controls">
+        <button class="ctrl-btn" onclick="togglePause()">暫停/開始</button>
+        <button class="ctrl-btn" onclick="resetSim()">重置軌跡</button>
+        <label>速度: <input type="range" id="speedRange" min="0" max="5" step="0.1" value="1.5"></label>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('mainCanvas');
+        const ctx = canvas.getContext('2d');
+        const width = canvas.width;
+        const height = canvas.height;
+        const cx = width / 2;
+        const cy = height / 2;
+
+        let mode = 'geocentric'; 
+        let isPaused = false;
+        let speedMultiplier = 1.5;
+        let t = 0; 
+        
+        let trail = []; 
+        let lastEarthLap = 0;
+
+        const infoTitle = document.getElementById('infoTitle');
+        const infoDesc = document.getElementById('infoDesc');
+        const legend = document.getElementById('legend');
+        const btns = document.querySelectorAll('.tab-btn');
+
+        const COLOR_NORMAL = '#ff4d4d';
+        const COLOR_RETRO = '#00ff88';
+
+        const TEXTS = {
+            geocentric: {
+                title: "視角 1: 地心說 (托勒密)",
+                desc: "地心說認為地球靜止。當火星在本輪內側運行，且方向與均輪相反時，就會產生綠色的逆行軌跡。",
+                legend: `<span style="color:var(--earth-color)">● 地球</span> <span style="margin-left:10px"><span class="dot" style="background:var(--mars-color)"></span>順行</span> <span style="margin-left:10px"><span class="dot" style="background:var(--retro-color)"></span>逆行</span>`
+            },
+            heliocentric: {
+                title: "視角 2: 日心說 (哥白尼)",
+                desc: "左側：太陽系俯視圖，顯示地球和火星繞太陽運行。右側：從地球觀察到的火星軌跡。當地球超車火星時，右側軌跡會出現綠色的逆行段。",
+                legend: `<span style="color:var(--sun-color)">● 太陽</span> <span style="margin-left:10px"><span class="dot" style="background:var(--earth-color)"></span>地球</span> <span style="margin-left:10px"><span class="dot" style="background:var(--mars-color)"></span>順行</span> <span style="margin-left:10px"><span class="dot" style="background:var(--retro-color)"></span>逆行</span>`
+            }
+        };
+
+        setMode('geocentric');
+        animate();
+
+        function setMode(newMode) {
+            mode = newMode;
+            t = 0;
+            trail = [];
+            lastEarthLap = 0;
+
+            infoTitle.innerText = TEXTS[mode].title;
+            infoDesc.innerText = TEXTS[mode].desc;
+            legend.innerHTML = TEXTS[mode].legend;
+            
+            btns.forEach(b => b.classList.remove('active'));
+            btns.forEach(b => {
+                if(b.getAttribute('onclick').includes(newMode)) b.classList.add('active');
+            });
+        }
+
+        function togglePause() { isPaused = !isPaused; }
+        function resetSim() { t = 0; trail = []; lastEarthLap = 0; }
+        
+        document.getElementById('speedRange').addEventListener('input', (e) => {
+            speedMultiplier = parseFloat(e.target.value);
+        });
+
+        function animate() {
+            requestAnimationFrame(animate);
+            
+            if(!isPaused) {
+                t += 0.01 * speedMultiplier;
+            }
+
+            ctx.fillStyle = '#050505';
+            ctx.fillRect(0, 0, width, height);
+
+            // 新增：繪製星空背景
+            drawStars();
+
+            if (mode === 'geocentric') drawGeocentric();
+            else if (mode === 'heliocentric') drawHeliocentric();
+        }
+
+        // --- MODE 1: GEOCENTRIC ---
+        function drawGeocentric() {
+            const earthX = cx;
+            const earthY = cy;
+
+            const defRadius = 120;
+            const defSpeed = 0.5;
+            const defAngle = -t * defSpeed; 
+            
+            const epiCenterX = earthX + Math.cos(defAngle) * defRadius;
+            const epiCenterY = earthY + Math.sin(defAngle) * defRadius;
+
+            const epiRadius = 40;
+            const epiSpeed = 2.0; 
+            const epiAngle = -t * epiSpeed;
+
+            const marsX = epiCenterX + Math.cos(epiAngle) * epiRadius;
+            const marsY = epiCenterY + Math.sin(epiAngle) * epiRadius;
+
+            // 判定逆行
+            let isRetro = false;
+            if (trail.length > 0) {
+                const prev = trail[trail.length - 1];
+                const currAng = Math.atan2(marsY - cy, marsX - cx);
+                const prevAng = Math.atan2(prev.y - cy, prev.x - cx);
+                
+                let dAng = currAng - prevAng;
+                if (dAng > Math.PI) dAng -= 2 * Math.PI;
+                if (dAng < -Math.PI) dAng += 2 * Math.PI;
+
+                if (dAng > 0) isRetro = true;
+            }
+
+            ctx.strokeStyle = '#333';
+            ctx.beginPath(); ctx.arc(earthX, earthY, defRadius, 0, Math.PI*2); ctx.stroke();
+
+            ctx.fillStyle = '#4d79ff';
+            ctx.beginPath(); ctx.arc(earthX, earthY, 10, 0, Math.PI*2); ctx.fill();
+            ctx.fillStyle = '#fff'; ctx.fillText("地球", earthX - 10, earthY + 25);
+
+            ctx.strokeStyle = '#444';
+            ctx.beginPath(); ctx.arc(epiCenterX, epiCenterY, epiRadius, 0, Math.PI*2); ctx.stroke();
+            
+            ctx.strokeStyle = '#555';
+            ctx.beginPath(); ctx.moveTo(epiCenterX, epiCenterY); ctx.lineTo(marsX, marsY); ctx.stroke();
+
+            trail.push({x: marsX, y: marsY, isRetro});
+            if(trail.length > 600) trail.shift();
+
+            drawTrail(3);
+
+            ctx.fillStyle = isRetro ? COLOR_RETRO : COLOR_NORMAL;
+            ctx.beginPath(); ctx.arc(marsX, marsY, 6, 0, Math.PI*2); ctx.fill();
+            
+            ctx.strokeStyle = 'rgba(255,255,255,0.1)';
+            ctx.setLineDash([5,5]);
+            ctx.beginPath(); ctx.moveTo(earthX, earthY);
+            const angle = Math.atan2(marsY - earthY, marsX - earthX);
+            ctx.lineTo(earthX + Math.cos(angle)*1000, earthY + Math.sin(angle)*1000);
+            ctx.stroke();
+            ctx.setLineDash([]);
+        }
+
+        // --- MODE 2: HELIOCENTRIC ---
+        function drawHeliocentric() {
+            // 計算地球和火星的軌道參數
+            const earthSpeed = 2.5;
+            const marsSpeed = 1.0;
+            const earthStartPhase = -2.0;
+
+            const earthAng = (-t * earthSpeed) + earthStartPhase;
+            const marsAng = -t * marsSpeed;
+
+            // === 左側：太陽系俯視圖 ===
+            const leftCenterX = 160;
+            const leftCenterY = 250;
+            const earthR = 50;
+            const marsR = 90;
+
+            const earthX_left = leftCenterX + Math.cos(earthAng) * earthR;
+            const earthY_left = leftCenterY + Math.sin(earthAng) * earthR;
+            const marsX_left = leftCenterX + Math.cos(marsAng) * marsR;
+            const marsY_left = leftCenterY + Math.sin(marsAng) * marsR;
+
+            // 繪製分隔線
+            ctx.strokeStyle = '#333';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(320, 0);
+            ctx.lineTo(320, height);
+            ctx.stroke();
+            ctx.lineWidth = 1;
+
+            // 繪製左側標題
+            ctx.fillStyle = '#aaa';
+            ctx.font = '14px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('太陽系俯視圖', leftCenterX, 480);
+
+            // 繪製軌道
+            ctx.strokeStyle = '#333';
+            ctx.beginPath();
+            ctx.arc(leftCenterX, leftCenterY, earthR, 0, Math.PI * 2);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.arc(leftCenterX, leftCenterY, marsR, 0, Math.PI * 2);
+            ctx.stroke();
+
+            // 繪製太陽
+            ctx.fillStyle = '#ffd700';
+            ctx.beginPath();
+            ctx.arc(leftCenterX, leftCenterY, 12, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.shadowBlur = 20;
+            ctx.shadowColor = '#ffd700';
+            ctx.fill();
+            ctx.shadowBlur = 0;
+
+            // 繪製視線（從地球指向火星）
+            ctx.strokeStyle = 'rgba(255,255,255,0.3)';
+            ctx.setLineDash([3, 3]);
+            ctx.beginPath();
+            ctx.moveTo(earthX_left, earthY_left);
+            ctx.lineTo(marsX_left, marsY_left);
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            // 繪製地球
+            ctx.fillStyle = '#4d79ff';
+            ctx.beginPath();
+            ctx.arc(earthX_left, earthY_left, 8, 0, Math.PI * 2);
+            ctx.fill();
+
+            // 繪製火星
+            ctx.fillStyle = '#ff4d4d';
+            ctx.beginPath();
+            ctx.arc(marsX_left, marsY_left, 7, 0, Math.PI * 2);
+            ctx.fill();
+
+            // === 右側：從地球看到的火星軌跡 ===
+            const rightCenterX = 560;
+            const rightCenterY = 250;
+
+            // 計算火星相對地球的位置
+            const relX = marsX_left - earthX_left;
+            const relY = marsY_left - earthY_left;
+
+            // 在右側視圖中，地球固定在中心，火星位置根據相對位置計算
+            const marsX_right = rightCenterX + relX;
+            const marsY_right = rightCenterY + relY;
+
+            // 繪製右側標題
+            ctx.fillStyle = '#aaa';
+            ctx.textAlign = 'center';
+            ctx.fillText('從地球觀察', rightCenterX, 480);
+
+            // 判定逆行
+            let isRetro = false;
+            if (trail.length > 0) {
+                const prev = trail[trail.length - 1];
+                const currAng = Math.atan2(marsY_right - rightCenterY, marsX_right - rightCenterX);
+                const prevAng = Math.atan2(prev.y - rightCenterY, prev.x - rightCenterX);
+
+                let dAng = currAng - prevAng;
+                if (dAng > Math.PI) dAng -= 2 * Math.PI;
+                if (dAng < -Math.PI) dAng += 2 * Math.PI;
+
+                if (dAng > 0) isRetro = true;
+            }
+
+            // 儲存軌跡
+            trail.push({x: marsX_right, y: marsY_right, isRetro});
+            if (trail.length > 800) trail.shift();
+
+            // 繪製軌跡
+            if (trail.length > 1) {
+                ctx.lineWidth = 3;
+                ctx.lineCap = 'round';
+                ctx.lineJoin = 'round';
+
+                for (let i = 0; i < trail.length - 1; i++) {
+                    const p1 = trail[i];
+                    const p2 = trail[i + 1];
+                    const dist = Math.hypot(p1.x - p2.x, p1.y - p2.y);
+
+                    if (dist < 100) {
+                        ctx.beginPath();
+                        ctx.strokeStyle = p2.isRetro ? COLOR_RETRO : COLOR_NORMAL;
+                        ctx.moveTo(p1.x, p1.y);
+                        ctx.lineTo(p2.x, p2.y);
+                        ctx.stroke();
+                    }
+                }
+                ctx.lineWidth = 1;
+            }
+
+            // 繪製固定的地球（右側中心）
+            ctx.fillStyle = '#4d79ff';
+            ctx.beginPath();
+            ctx.arc(rightCenterX, rightCenterY, 10, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = '#fff';
+            ctx.font = '12px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('地球', rightCenterX, rightCenterY + 25);
+
+            // 繪製當前火星位置
+            ctx.fillStyle = isRetro ? COLOR_RETRO : COLOR_NORMAL;
+            ctx.beginPath();
+            ctx.arc(marsX_right, marsY_right, 8, 0, Math.PI * 2);
+            ctx.fill();
+
+            // 加強逆行時的視覺效果
+            if (isRetro) {
+                ctx.strokeStyle = COLOR_RETRO;
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.arc(marsX_right, marsY_right, 12, 0, Math.PI * 2);
+                ctx.stroke();
+                ctx.lineWidth = 1;
+            }
+        }
+
+        function drawStars() {
+            ctx.fillStyle = '#fff';
+            for(let i=0; i<50; i++) {
+                const sx = (Math.sin(i*123) * width + width) % width;
+                const sy = (Math.cos(i*321) * height + height) % height;
+                ctx.globalAlpha = Math.random() * 0.5 + 0.2;
+                ctx.fillRect(sx, sy, 1.5, 1.5);
+            }
+            ctx.globalAlpha = 1.0;
+        }
+
+        function drawTrail(lineWidth) {
+            if (trail.length < 2) return;
+            
+            ctx.lineWidth = lineWidth;
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+            
+            for (let i = 0; i < trail.length - 1; i++) {
+                const p1 = trail[i];
+                const p2 = trail[i+1];
+                const dist = Math.hypot(p1.x - p2.x, p1.y - p2.y);
+                
+                if(dist < 100) {
+                    ctx.beginPath();
+                    ctx.strokeStyle = p2.isRetro ? COLOR_RETRO : COLOR_NORMAL;
+                    ctx.moveTo(p1.x, p1.y);
+                    ctx.lineTo(p2.x, p2.y);
+                    ctx.stroke();
+                }
+            }
+        }
+
+    </script>
+</body>
+</html>
