@@ -31,33 +31,6 @@
 				padding: 1rem;
 				margin: 1rem 0;
 			}
-			.search-result-item {
-				padding: 0.75rem;
-				border-bottom: 1px solid #eee;
-				cursor: pointer;
-				transition: background-color 0.2s;
-			}
-			.search-result-item:hover {
-				background-color: #f9f9f9;
-			}
-			.search-result-item:last-child {
-				border-bottom: none;
-			}
-			.search-result-title {
-				font-weight: bold;
-				color: #f56a6a;
-				margin-bottom: 0.25rem;
-			}
-			.search-result-content {
-				font-size: 0.9em;
-				color: #666;
-				line-height: 1.4;
-			}
-			.search-highlight {
-				background-color: #ffeb3b;
-				padding: 0 2px;
-				border-radius: 2px;
-			}
 		</style>
 	</head>
 	<body class="is-preload">
@@ -246,13 +219,6 @@
 					<div id="sidebar">
 						<div class="inner">
 
-							<!-- Search -->
-								<section id="search" class="alt">
-									<form onsubmit="return false;">
-										<input type="text" name="query" id="query" placeholder="搜尋課程內容..." autocomplete="off" />
-									</form>
-									<div id="search-results" style="display: none; background: #fff; border: 1px solid #ddd; border-radius: 4px; margin-top: 0.5rem; max-height: 300px; overflow-y: auto;"></div>
-								</section>
 
 							<!-- Menu -->
 								<nav id="menu">
@@ -333,95 +299,6 @@
 						}
 					});
 
-					// 搜尋功能
-					var searchData = [
-						{
-							id: 'banner',
-							title: '課程介紹',
-							content: '自然探究與實作探究入門 什麼是探究與實作 為什麼要上這堂課 科學探究能力 實際操作 實驗 科學研究 批判思考 問題解決'
-						},
-						{
-							id: 'scoring',
-							title: '計分方式',
-							content: '計分方式 課堂表現 30% 參與討論 提問 實驗操作 考試 出缺席 實驗相關紀錄 40% 科學筆記 實驗學習單 實驗書面報告 簡報與分享能力 30% 簡報製作 上臺發表 同儕評鑑 註記事項 計分方式提醒 表單紀錄 當次課程結束前完成 下次上課前交回 不補交 課程期間 勿處理非本課程事務'
-						},
-						{
-							id: 'absence',
-							title: '請假問題',
-							content: '請假問題 請假 寫信通知老師 避免損失個人權益 補作課程規定作業 加註當日請假 疑問 先問同組同學 再問任課老師 當週作業 下次上課前補完作業 非當週作業 其他同學繳交期限一致 教師酌情調整分數'
-						},
-						{
-							id: 'deductions',
-							title: '常見扣分原因',
-							content: '常見扣分原因 遲到 曠課 實驗室吵鬧 奔跑 未經教師同意更換座位 組別 擅自移動 實驗室中飲食 進行與課堂無關的操作 玩手機 做社團道具 著拖鞋 涼鞋'
-						}
-					];
-
-					$('#query').on('input', function() {
-						var query = $(this).val().trim().toLowerCase();
-						var resultsContainer = $('#search-results');
-						
-						if (query.length === 0) {
-							resultsContainer.hide();
-							return;
-						}
-						
-						var results = [];
-						searchData.forEach(function(item) {
-							if (item.content.toLowerCase().includes(query)) {
-								// 提取匹配內容的片段
-								var content = item.content;
-								var index = content.toLowerCase().indexOf(query);
-								var start = Math.max(0, index - 30);
-								var end = Math.min(content.length, index + query.length + 30);
-								var snippet = content.substring(start, end);
-								
-								// 高亮匹配的文字
-								var highlightedSnippet = snippet.replace(
-									new RegExp('(' + query + ')', 'gi'),
-									'<span class="search-highlight">$1</span>'
-								);
-								
-								results.push({
-									id: item.id,
-									title: item.title,
-									snippet: (start > 0 ? '...' : '') + highlightedSnippet + (end < content.length ? '...' : '')
-								});
-							}
-						});
-						
-						if (results.length > 0) {
-							var html = '';
-							results.forEach(function(result) {
-								html += '<div class="search-result-item" data-target="#' + result.id + '">';
-								html += '<div class="search-result-title">' + result.title + '</div>';
-								html += '<div class="search-result-content">' + result.snippet + '</div>';
-								html += '</div>';
-							});
-							resultsContainer.html(html).show();
-						} else {
-							resultsContainer.html('<div class="search-result-item"><div class="search-result-content">找不到相關內容</div></div>').show();
-						}
-					});
-
-					// 點擊搜尋結果跳轉
-					$(document).on('click', '.search-result-item[data-target]', function() {
-						var target = $($(this).data('target'));
-						if (target.length) {
-							$('html, body').animate({
-								scrollTop: target.offset().top - 100
-							}, 1000);
-							$('#search-results').hide();
-							$('#query').val('');
-						}
-					});
-
-					// 點擊其他地方隱藏搜尋結果
-					$(document).on('click', function(e) {
-						if (!$(e.target).closest('#search').length) {
-							$('#search-results').hide();
-						}
-					});
 				});
 			</script>
 
