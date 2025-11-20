@@ -1,0 +1,759 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<title>(Re)considering Nature of Science Education - Presentation</title>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+	<link rel="stylesheet" href="../editor-temp/assets/css/main.css" />
+	<style>
+		/* 章節分頁效果 */
+		.slide-section {
+			min-height: 100vh;
+			padding: 2rem 0;
+			border-bottom: 2px solid #e5eaed;
+		}
+
+		.slide-section:last-child {
+			border-bottom: none;
+		}
+
+		/* 螢光筆標記效果 - 用於強調重點詞彙 */
+		.highlight {
+			background: linear-gradient(transparent 60%, #FFE15C 60%);
+			font-weight: 500;
+			padding: 0 2px;
+		}
+
+		/* 強調框樣式 - 用於重要引用和註記 */
+		.highlight-box {
+			background: #f0f4f7;
+			border-left: 4px solid #475a6c;
+			padding: 1.5rem;
+			margin: 1.5rem 0;
+		}
+
+		/* 學術引用樣式 */
+		.academic-quote {
+			font-style: italic;
+			color: #475a6c;
+			padding-left: 1rem;
+			border-left: 3px solid #d8c690;
+			margin: 1rem 0;
+		}
+
+		/* 研究問題樣式 */
+		.research-question {
+			background: #fff8e1;
+			border: 2px solid #d8c690;
+			padding: 1.5rem;
+			margin: 2rem 0;
+			border-radius: 0.375em;
+		}
+
+		/* 邏輯連接箭頭 */
+		.logic-arrow {
+			color: #f56a6a;
+			font-weight: bold;
+			margin: 0 0.5rem;
+		}
+
+		/* 頁碼標示 */
+		.page-number {
+			position: absolute;
+			top: 1rem;
+			right: 1rem;
+			background: #475a6c;
+			color: white;
+			padding: 0.5rem 1rem;
+			border-radius: 0.375em;
+			font-size: 0.9em;
+		}
+
+		/* Banner 特殊樣式 */
+		#banner {
+			background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+			color: white;
+		}
+
+		#banner h1, #banner p {
+			color: white;
+		}
+
+		/* 關鍵概念卡片 */
+		.concept-card {
+			background: white;
+			border: 2px solid #e5eaed;
+			padding: 1rem;
+			margin: 1rem 0;
+			border-radius: 0.375em;
+			transition: transform 0.2s;
+		}
+
+		.concept-card:hover {
+			transform: translateY(-2px);
+			box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+		}
+
+	/* ========== 側邊欄切換功能（改良版） ========== */
+
+	/* 切換按鈕樣式 - 固定在頁面左上角 */
+	.sidebar-toggle {
+		position: fixed;
+		left: 1rem;
+		top: 1rem;
+		width: 1.5rem;
+		height: 1.5rem;
+		background: #475a6c;
+		border-radius: 0.375em;
+		color: white !important;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		z-index: 10001;
+		transition: background 0.2s ease, transform 0.2s ease;
+		box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+		text-decoration: none !important;
+	}
+
+	.sidebar-toggle:hover {
+		background: #3d4449;
+		transform: scale(1.05);
+		box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+	}
+
+	.sidebar-toggle .icon {
+		font-size: 1.25rem;
+	}
+
+	/* 側邊欄平滑過渡動畫 */
+	#sidebar {
+		transition: margin-left 0.35s ease;
+	}
+
+	/* 支援大螢幕切換 - 覆蓋模板預設行為 */
+	@media screen and (min-width: 1281px) {
+		#sidebar.inactive {
+			margin-left: -26em;
+		}
+	}
+
+	/* 主內容區域平滑過渡 */
+	#main {
+		transition: margin-left 0.35s ease;
+	}
+
+	/* 小螢幕優化 - 按鈕顏色更醒目 */
+	@media screen and (max-width: 1280px) {
+		.sidebar-toggle {
+			background: #f56a6a;
+		}
+
+		.sidebar-toggle:hover {
+			background: #f44336;
+		}
+	}
+	</style>
+</head>
+<body class="is-preload">
+
+	<!-- Wrapper -->
+	<div id="wrapper">
+
+		<!-- Main -->
+		<div id="main">
+			<div class="inner">
+
+				<!-- Header -->
+				<header id="header">
+					<a href="#sidebar" class="sidebar-toggle" title="切換側邊欄">
+						<span class="icon solid fa-bars"></span>
+					</a>
+					<a href="nos-presentation.html" class="logo"><strong>Lin, Yi-Chen</strong> Presentation</a>
+					<ul class="icons">
+						<li><a href="#" class="icon brands fa-twitter"><span class="label">Twitter</span></a></li>
+						<li><a href="#" class="icon brands fa-facebook-f"><span class="label">Facebook</span></a></li>
+						<li><a href="#" class="icon solid fa-envelope"><span class="label">Email</span></a></li>
+					</ul>
+				</header>
+
+				<!-- Page 1: Banner / Cover -->
+				<section id="banner">
+					<div class="content">
+						<header>
+							<h1 style="padding-left: 20px;">(Re)considering Nature of Science Education in the Face of Socio‐scientific Challenges and Injustices</h1>
+							<p style="padding-left: 20px;">Insights from a Critical‐Decolonial Perspective</p>
+							<p style="padding-left: 20px;">Haira E. Gandolfi</p>
+					</div>
+				</section>
+
+				<!-- Page 2: Mind Map -->
+				<section id="page-2" class="slide-section">
+					<span class="page-number">Page 2</span>
+					<header class="major">
+						<h2><span class="icon solid fa-project-diagram"></span> Conceptual Overview</h2>
+					</header>
+					<div class="content">
+						<span class="image main">
+							<img src="mind map.png" alt="Mind Map - Conceptual Overview" />
+						</span>
+					</div>
+				</section>
+
+				<!-- Page 3: Big Picture -->
+				<section id="page-3" class="slide-section">
+					<span class="page-number">Page 3</span>
+					<header class="major">
+						<h2><span class="icon solid fa-eye"></span> Big Picture</h2>
+					</header>
+
+					<div class="highlight-box">
+						<h3><span class="icon solid fa-exclamation-triangle"></span> The Central Critique</h3>
+						<p>Criticizing science education for being <span class="highlight">naive and neutral</span></p>
+						<p class="academic-quote"><strong>Technical rationality</strong> and <strong>positivist</strong></p>
+					</div>
+
+					<div class="content">
+						<h3><span class="icon solid fa-question-circle"></span> Why this is an issue?</h3>
+						<div class="concept-card">
+							<p>Cannot adequately address complex <span class="highlight">socio-political and justice</span> scientific challenges</p>
+							<p style="font-size: 0.9em; color: #7f888f; margin-top: 0.5rem;"><em>(Practical logic chain)</em></p>
+						</div>
+					</div>
+				</section>
+
+				<!-- Page 4: More Specific Challenges -->
+				<section id="page-4" class="slide-section">
+					<span class="page-number">Page 4</span>
+					<header class="major">
+						<h2><span class="icon solid fa-list"></span> More specific for these challenges</h2>
+						<p>Clearer Background</p>
+					</header>
+
+					<div class="content">
+						<ul style="font-size: 1.1em; line-height: 2;">
+							<li>science-technology-society-environment<span class="highlight">(STSE)</span></li>
+							<li>socio-scientific issues<span class="highlight">(SSIs)</span></li>
+							<li>socially-acute questions<span class="highlight">(SAQs)</span></li>
+						</ul>
+
+						<div class="highlight-box" style="margin-top: 2rem;">
+							<p style="display: inline; font-size: 1.2em;">These are collectively termed <span class="highlight">'science-in-context' (SinC)</span></p>
+							<p style="margin-top: 1rem; font-size: 0.9em; color: #7f888f;"><em>Bencze et al., 2020</em></p>
+						</div>
+					</div>
+				</section>
+
+				<!-- Page 5: The Nature of SinC -->
+				<section id="page-5" class="slide-section">
+					<span class="page-number">Page 5</span>
+					<header class="major">
+						<h2><span class="icon solid fa-microscope"></span> The Nature of SinC?</h2>
+						<p>Elaboration on Scientific Literacy Visions</p>
+					</header>
+
+					<div class="content">
+						<div class="row">
+							<div class="col-6 col-12-medium">
+								<div class="concept-card">
+									<h3><span class="icon solid fa-flask"></span> Vision I</h3>
+									<p><strong>Core science contents and skills</strong></p>
+									<p style="font-size: 0.9em; color: #7f888f;">Traditional approach focusing on scientific knowledge and methods</p>
+								</div>
+							</div>
+							<div class="col-6 col-12-medium">
+								<div class="concept-card" style="border-color: #f56a6a;">
+									<h3><span class="icon solid fa-globe"></span> Vision II</h3>
+									<p><strong>Link to societal aspects and environments</strong></p>
+									<p style="font-size: 0.9em; color: #f56a6a;"><em>The prevailing trend</em> — still characterized by <span class="highlight">technical rationality</span></p>
+								</div>
+							</div>
+						</div>
+
+						<div class="highlight-box" style="margin-top: 2rem;">
+							<p>While Vision II represents progress, it remains limited in addressing deeper socio-political dimensions of scientific practice.</p>
+						</div>
+					</div>
+				</section>
+
+				<!-- Page 6: Why This Is an Issue -->
+				<section id="page-6" class="slide-section">
+					<span class="page-number">Page 6</span>
+					<header class="major">
+						<h2><span class="icon solid fa-search"></span> Why This Is an Issue?</h2>
+					</header>
+
+					<div class="content">
+						<div class="highlight-box">
+							<h3>Key Scholarly Critique</h3>
+							<p class="academic-quote">
+								<span class="icon solid fa-quote-left"></span>
+								Science education has <span class="highlight">domesticated</span> SSIs
+								<span class="icon solid fa-quote-right"></span>
+							</p>
+							<p style="text-align: right; margin-top: 1rem;"><em>— Bazzul (2020)</em></p>
+						</div>
+
+						<div class="concept-card">
+							<h3><span class="icon solid fa-link"></span> Theoretical Logic Chain</h3>
+							<p>Due to "science education [being] distinctly <span class="highlight">conservative</span> in character"</p>
+						</div>
+
+						<div class="concept-card">
+							<h3><span class="icon solid fa-arrow-right"></span> Logical Connection: From Theory to Practice</h3>
+							<p><span class="highlight">Neoliberal</span> educational policymaking <span class="logic-arrow">→</span> <span class="highlight">one-size-fits-all</span> curricula</p>
+						</div>
+					</div>
+				</section>
+
+				<!-- Page 7: Highlight the Need for Vision III -->
+				<section id="page-7" class="slide-section">
+					<span class="page-number">Page 7</span>
+					<header class="major">
+						<h2><span class="icon solid fa-lightbulb"></span> Highlight the Need for Vision III</h2>
+					</header>
+
+					<div class="content">
+						<div class="highlight-box" style="background: #fff8e1; border-left-color: #d8c690;">
+							<h3><span class="icon solid fa-star"></span> Vision III</h3>
+						</div>
+
+						<div class="features">
+							<article>
+								<span class="icon solid fa-network-wired"></span>
+								<div class="content">
+									<h3>Political Epistemology</h3>
+									<p>Science <strong>intertwines</strong> with socio-political contexts</p>
+									<p style="font-size: 0.9em; color: #7f888f;">Recognizing the inherently <span class="highlight">political epistemology</span> of scientific knowledge production</p>
+								</div>
+							</article>
+							<article>
+								<span class="icon solid fa-globe-americas"></span>
+								<div class="content">
+									<h3>Diverse Landscapes</h3>
+									<p style="font-size: 0.9em; color: #7f888f;">Acknowledging multiple contexts and perspectives beyond Western frameworks</p>
+								</div>
+							</article>
+							<article>
+								<span class="icon solid fa-balance-scale"></span>
+								<div class="content">
+									<h3>Emancipation Goal</h3>
+									<p>Aim at emancipation and <span class="highlight">socio-ecojustice</span></p>
+								</div>
+							</article>
+						</div>
+					</div>
+				</section>
+
+				<!-- Page 8: What Is Seen When Using Vision III -->
+				<section id="page-8" class="slide-section">
+					<span class="page-number">Page 8</span>
+					<header class="major">
+						<h2><span class="icon solid fa-binoculars"></span> What Is Seen When Using Vision III?</h2>
+					</header>
+
+					<div class="content">
+						<div class="concept-card" style="border-color: #f56a6a; border-width: 3px;">
+							<h3><span class="icon solid fa-history"></span> Science and Colonialism</h3>
+							<p><span class="highlight">Science</span> has played a prominent role in the <span class="highlight">colonial process</span></p>
+							<p style="font-size: 0.9em; color: #7f888f; margin-top: 1rem;">Historical recognition that scientific development was intertwined with colonial expansion and exploitation.</p>
+						</div>
+
+						<div class="concept-card" style="border-color: #667eea; border-width: 3px;">
+							<h3><span class="icon solid fa-leaf"></span> Environmental Injustices</h3>
+							<p><span class="highlight">Environmental injustices</span>: an unequal exposition of already marginalised communities to the impact of environmental degradation</p>
+							<p style="font-size: 0.9em; color: #7f888f; margin-top: 1rem;"><strong>MAPA</strong> (Most Affected People and Areas) — those who contributed least to climate change suffer most from its consequences.</p>
+						</div>
+
+						<div class="highlight-box">
+							<p><span class="icon solid fa-info-circle"></span> Vision III enables us to see the power dynamics, historical injustices, and ongoing inequities embedded within scientific practice and knowledge production.</p>
+						</div>
+					</div>
+				</section>
+
+				<!-- Page 9: How Do We Prepare Students -->
+				<section id="page-9" class="slide-section">
+					<span class="page-number">Page 9</span>
+					<header class="major">
+						<h2><span class="icon solid fa-graduation-cap"></span> How Do We Prepare Our Students to Face SinC Issues?</h2>
+					</header>
+
+					<div class="content">
+						<div class="highlight-box" style="background: #e3f2fd; border-left-color: #1976d2;">
+							<h3><span class="icon solid fa-atom"></span> The Role of <span class="highlight">NOS</span> (Nature of Science)</h3>
+						</div>
+
+						<div class="row">
+							<div class="col-6 col-12-medium">
+								<div class="concept-card">
+									<h3><span class="icon solid fa-check-circle"></span> Why Teaching NOS Is Helpful?</h3>
+									<ul>
+										<li>Supporting reflection and critical thinking</li>
+										<li>Understanding science as a human endeavor</li>
+										<li>Recognizing the social dimensions of knowledge</li>
+									</ul>
+								</div>
+							</div>
+							<div class="col-6 col-12-medium">
+								<div class="concept-card" style="border-color: #ff9800;">
+									<h3><span class="icon solid fa-exclamation-circle"></span> The Current Gap</h3>
+									<p><span class="highlight">NOS</span> teaching and learning <strong>still have some way to go</strong> to achieve such potential</p>
+									<p style="font-size: 0.9em; color: #7f888f; margin-top: 1rem;">Particularly from <span class="highlight">socio-political perspectives</span></p>
+								</div>
+							</div>
+						</div>
+
+						<p class="logic-arrow" style="text-align: center; font-size: 2em; margin: 2rem 0;">↓</p>
+						<p style="text-align: center; font-size: 1.1em;">This gap motivates the research questions explored in this paper.</p>
+					</div>
+				</section>
+
+				<!-- Page 10: Research Questions -->
+				<section id="page-10" class="slide-section">
+					<span class="page-number">Page 10</span>
+					<header class="major">
+						<h2><span class="icon solid fa-question"></span> Research Questions (RQs)</h2>
+					</header>
+
+					<div class="research-question">
+						<h3 style="color: #d8c690;"><span class="icon solid fa-clipboard-list"></span> Core Research Questions</h3>
+
+						<div style="margin: 2rem 0;">
+							<h4><strong>RQ1:</strong></h4>
+							<p style="font-size: 1.1em; line-height: 1.8;">What <span class="highlight">NOS</span> concepts should be given priority in science teaching with the aim of <strong>empowering students</strong> in relation to societal issues?</p>
+						</div>
+
+						<div style="margin: 2rem 0;">
+							<h4><strong>RQ2:</strong></h4>
+							<p style="font-size: 1.1em; line-height: 1.8;">What could such teaching <strong>look like</strong>?</p>
+						</div>
+					</div>
+
+					<div class="highlight-box">
+						<p><span class="icon solid fa-compass"></span> These questions guide an exploration of how critical-decolonial perspectives can inform NOS education for addressing socio-scientific challenges.</p>
+					</div>
+				</section>
+
+				<!-- Page 11: Critical-Decolonial Lens -->
+				<section id="page-11" class="slide-section">
+					<span class="page-number">Page 11</span>
+					<header class="major">
+						<h2><span class="icon solid fa-glasses"></span> Using Critical‐Decolonial Lens to Explore RQs</h2>
+					</header>
+
+					<div class="content">
+						<div class="highlight-box" style="background: #f3e5f5; border-left-color: #7b1fa2;">
+							<h3><span class="icon solid fa-book-open"></span> Critical Pedagogy from Paulo Freire</h3>
+						</div>
+
+						<h3><span class="icon solid fa-comments"></span> Discussion Questions for Understanding Critical Pedagogy</h3>
+
+						<div class="concept-card">
+							<h4><span class="icon solid fa-1"></span> Question 1</h4>
+							<p style="font-size: 1.05em; line-height: 1.8;">What <strong>political vision</strong> for an 'ideal society' am I actually promoting in my classroom?</p>
+						</div>
+
+						<div class="concept-card">
+							<h4><span class="icon solid fa-2"></span> Question 2</h4>
+							<p style="font-size: 1.05em; line-height: 1.8;">What do you <strong>define knowledge</strong>?</p>
+						</div>
+					</div>
+				</section>
+
+				<!-- Page 12: Knowledge Definition -->
+				<section id="page-12" class="slide-section">
+					<span class="page-number">Page 12</span>
+					<header class="major">
+						<h2><span class="icon solid fa-brain"></span> Reconceptualizing Knowledge</h2>
+					</header>
+
+					<div class="content">
+						<div class="highlight-box" style="background: linear-gradient(135deg, #667eea22 0%, #764ba222 100%); border-left: 6px solid #667eea;">
+							<h3><span class="icon solid fa-key"></span> Critical Understanding of Knowledge</h3>
+							<p style="font-size: 1.15em; line-height: 1.8; margin-top: 1rem;">
+								Knowledge is not merely knowing <strong>'what the facts are,'</strong> but critically understanding <strong>'how those facts were produced.'</strong>
+							</p>
+						</div>
+
+						<div style="margin-top: 3rem;">
+							<h3><span class="icon solid fa-project-diagram"></span> The Conceptual Chain</h3>
+							<div class="row" style="text-align: center;">
+								<div class="col-12">
+									<div style="display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 1rem; font-size: 1.1em;">
+										<div class="concept-card" style="flex: 0 0 auto; min-width: 120px;">
+											<span class="highlight">NOS</span>
+										</div>
+										<span class="logic-arrow" style="font-size: 1.5em;">→</span>
+										<div class="concept-card" style="flex: 0 0 auto; min-width: 160px;">
+											Power awareness
+										</div>
+										<span class="logic-arrow" style="font-size: 1.5em;">→</span>
+										<div class="concept-card" style="flex: 0 0 auto; min-width: 160px;">
+											Problem-posing
+										</div>
+										<span class="logic-arrow" style="font-size: 1.5em;">→</span>
+										<div class="concept-card" style="flex: 0 0 auto; min-width: 120px;">
+											<span class="highlight">SinC</span>
+										</div>
+									</div>
+								</div>
+							</div>
+							<p style="text-align: center; margin-top: 2rem; font-size: 0.9em; color: #7f888f; font-style: italic;">
+								Understanding the production of knowledge enables critical engagement with science-in-context issues.
+							</p>
+						</div>
+					</div>
+				</section>
+
+				<!-- Page 13: Emerging Challenges -->
+				<section id="page-13" class="slide-section">
+					<span class="page-number">Page 13</span>
+					<header class="major">
+						<h2><span class="icon solid fa-flag"></span> Emerging Challenges of Teaching SinC Issues</h2>
+						<p>What We Are Familiar With</p>
+					</header>
+
+					<div class="content">
+						<div class="row">
+							<div class="col-6 col-12-medium">
+								<div class="concept-card">
+									<h3><span class="icon solid fa-1"></span> From Local to Global?</h3>
+									<p>How do we bridge the gap between local contexts and global issues?</p>
+								</div>
+							</div>
+							<div class="col-6 col-12-medium">
+								<div class="concept-card">
+									<h3><span class="icon solid fa-2"></span> Relevant to Students?</h3>
+									<p>How do we ensure issues resonate with students' lived experiences?</p>
+								</div>
+							</div>
+						</div>
+
+						<div class="highlight-box" style="margin-top: 2rem;">
+							<h3><span class="icon solid fa-lightbulb"></span> How to Make These Challenges Visible?</h3>
+							<p><span class="highlight">Decolonial perspectives</span> seek to make visible and then challenge the socio-political and social injustice legacies of historical colonialism.</p>
+						</div>
+
+						<div style="margin-top: 2rem;">
+							<h3><span class="icon solid fa-eye"></span> What You May See by Using Decolonial Perspectives?</h3>
+							<div class="features">
+								<article>
+									<span class="icon solid fa-map-marker-alt"></span>
+									<div class="content">
+										<h4>The Center of Knowledge</h4>
+										<p>Recognizing how knowledge production is geographically and culturally centered in <strong>USA and Europe</strong></p>
+									</div>
+								</article>
+								<article>
+									<span class="icon solid fa-not-equal"></span>
+									<div class="content">
+										<h4>Created Opposition</h4>
+										<p>Challenging the false dichotomy that <strong>"Western cultures are rational"</strong> while others are not</p>
+									</div>
+								</article>
+							</div>
+						</div>
+					</div>
+				</section>
+
+				<!-- Page 14: What the Author Found -->
+				<section id="page-14" class="slide-section">
+					<span class="page-number">Page 14</span>
+					<header class="major">
+						<h2><span class="icon solid fa-trophy"></span> What the Author Found?</h2>
+						<p>Four Key Take-Away Points in the Paper</p>
+					</header>
+
+					<div class="content">
+						<div class="features">
+							<article>
+								<span class="icon solid fa-link"></span>
+								<div class="content">
+									<h3>1. Science as Intertwined</h3>
+									<p>Understanding science as <span class="highlight">intertwined</span> with social, political and moral legacies and obligations</p>
+									<p style="font-size: 0.9em; color: #7f888f; margin-top: 0.5rem;">Science is not neutral or separate from society—it is deeply embedded in social and political contexts.</p>
+								</div>
+							</article>
+
+							<article>
+								<span class="icon solid fa-users"></span>
+								<div class="content">
+									<h3>2. Who Benefits?</h3>
+									<p>Recognising that complex socio-historical processes impact the production of knowledge in science, <span class="highlight">who</span> benefits (and who does not) from such knowledge and <span class="highlight">who</span> is supported to be part of these knowledge communities</p>
+									<p style="font-size: 0.9em; color: #7f888f; margin-top: 0.5rem;">Critical examination of power dynamics in knowledge production and distribution.</p>
+								</div>
+							</article>
+
+							<article>
+								<span class="icon solid fa-globe"></span>
+								<div class="content">
+									<h3>3. Addressing Insularity</h3>
+									<p>Addressing the <span class="highlight">insularity</span> of narratives about science, scientific development and voices as emanating only from the Global North</p>
+									<p style="font-size: 0.9em; color: #7f888f; margin-top: 0.5rem;">Expanding beyond Western-centric narratives to include diverse knowledge systems and perspectives.</p>
+								</div>
+							</article>
+
+							<article>
+								<span class="icon solid fa-exclamation-triangle"></span>
+								<div class="content">
+									<h3>4. Recognising Oppression</h3>
+									<p>Recognising <span class="highlight">oppressive</span> aspects within historical and contemporary scientific (and technological) developments</p>
+									<p style="font-size: 0.9em; color: #7f888f; margin-top: 0.5rem;">Acknowledging how science has been used to justify and perpetuate systems of oppression.</p>
+								</div>
+							</article>
+						</div>
+
+						<div class="highlight-box" style="margin-top: 2rem;">
+							<p><span class="icon solid fa-info-circle"></span> These four insights provide a framework for reimagining NOS education through a critical-decolonial lens, enabling students to engage more deeply with socio-scientific challenges.</p>
+						</div>
+					</div>
+				</section>
+
+				<!-- Page 15: Representative Example -->
+				<section id="page-15" class="slide-section">
+					<span class="page-number">Page 15</span>
+					<header class="major">
+						<h2><span class="icon solid fa-chalkboard-teacher"></span> A Representative Example in the Paper</h2>
+						<p>Materials Sciences</p>
+					</header>
+
+					<div class="content">
+						<div class="highlight-box" style="background: #fff3e0; border-left-color: #ff9800;">
+							<h3><span class="icon solid fa-book"></span> Storytelling Exercise</h3>
+						</div>
+
+						<div class="research-question">
+							<h4><span class="icon solid fa-pencil-alt"></span> Reflective Activity</h4>
+							<p style="font-size: 1.05em; line-height: 1.8; margin-top: 1rem;">
+								Please consider a context from your own discipline. Focus on the <span class="highlight">societal-political aspects</span> within this context, the <span class="highlight">potential injustices</span> that might arise, and whether this content is <span class="highlight">currently represented in school science teaching</span>.
+							</p>
+						</div>
+
+						<div class="row" style="margin-top: 2rem;">
+							<div class="col-4 col-12-small">
+								<div class="concept-card">
+									<h4><span class="icon solid fa-atom"></span> Societal-Political</h4>
+									<p style="font-size: 0.9em;">How does your discipline intersect with power structures?</p>
+								</div>
+							</div>
+							<div class="col-4 col-12-small">
+								<div class="concept-card">
+									<h4><span class="icon solid fa-balance-scale"></span> Potential Injustices</h4>
+									<p style="font-size: 0.9em;">What inequities or harms might be involved?</p>
+								</div>
+							</div>
+							<div class="col-4 col-12-small">
+								<div class="concept-card">
+									<h4><span class="icon solid fa-school"></span> School Representation</h4>
+									<p style="font-size: 0.9em;">Is this critical perspective currently taught?</p>
+								</div>
+							</div>
+						</div>
+
+						<div class="highlight-box" style="margin-top: 3rem;">
+							<h3><span class="icon solid fa-graduation-cap"></span> Toward Transformative NOS Education</h3>
+							<p style="font-size: 1.05em; line-height: 1.8;">
+								By applying critical-decolonial perspectives to our teaching of Nature of Science, we can empower students to understand not just <em>what</em> science knows, but <em>how</em> and <em>why</em> that knowledge was produced, <em>who</em> benefits from it, and <em>what</em> responsibilities we have in addressing socio-scientific challenges and injustices.
+							</p>
+						</div>
+
+						<div style="text-align: center; margin-top: 3rem; padding: 2rem; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 0.375em;">
+							<h3 style="color: white; margin-bottom: 1rem;"> Thank You</h3>
+						</div>
+					</div>
+				</section>
+
+			</div>
+		</div>
+
+		<!-- Sidebar -->
+		<div id="sidebar">
+			<div class="inner">
+
+				<!-- Menu -->
+				<nav id="menu">
+					<header class="major">
+						<h2>Navigation</h2>
+					</header>
+					<ul>
+						<li><a href="#banner">Cover / Page 1</a></li>
+						<li><a href="#page-2">Conceptual Overview / Page 2</a></li>
+						<li><a href="#page-3">Big Picture / Page 3</a></li>
+						<li><a href="#page-4">Specific Challenges / Page 4</a></li>
+						<li><a href="#page-5">Nature of SinC / Page 5</a></li>
+						<li><a href="#page-6">Why This Is an Issue / Page 6</a></li>
+						<li><a href="#page-7">Vision III / Page 7</a></li>
+						<li><a href="#page-8">Using Vision III / Page 8</a></li>
+						<li><a href="#page-9">Preparing Students / Page 9</a></li>
+						<li><a href="#page-10">Research Questions / Page 10</a></li>
+						<li><a href="#page-11">Critical-Decolonial Lens / Page 11</a></li>
+						<li><a href="#page-12">Reconceptualizing Knowledge / Page 12</a></li>
+						<li><a href="#page-13">Emerging Challenges / Page 13</a></li>
+						<li><a href="#page-14">Key Findings / Page 14</a></li>
+						<li><a href="#page-15">Example & Reflection / Page 15</a></li>
+					</ul>
+				</nav>
+
+				<!-- Section -->
+				<section>
+					<header class="major">
+						<h2>About This Presentation</h2>
+					</header>
+					<div class="mini-posts">
+						<article>
+							<p>This presentation explores insights from <strong>Haira E. Gandolfi's</strong> work on reconsidering Nature of Science education through critical-decolonial perspectives.</p>
+						</article>
+					</div>
+					<ul class="actions">
+						<li><a href="#page-10" class="button">View Research Questions</a></li>
+					</ul>
+				</section>
+
+				<!-- Section -->
+				<section>
+					<header class="major">
+						<h2>Key Concepts</h2>
+					</header>
+					<ul class="contact">
+						<li class="icon solid fa-atom"><strong>NOS</strong> - Nature of Science</li>
+						<li class="icon solid fa-flask"><strong>SinC</strong> - Science-in-Context</li>
+						<li class="icon solid fa-graduation-cap"><strong>SSIs</strong> - Socio-Scientific Issues</li>
+						<li class="icon solid fa-globe"><strong>STSE</strong> - Science-Technology-Society-Environment</li>
+					</ul>
+				</section>
+
+				<!-- Footer -->
+				<footer id="footer">
+					<p class="copyright">&copy; Presentation. All rights reserved. Design: <a href="https://html5up.net">HTML5 UP</a>.</p>
+				</footer>
+
+			</div>
+		</div>
+
+	</div>
+
+	<!-- Scripts -->
+	<script src="../editor-temp/assets/js/jquery.min.js"></script>
+	<script src="../editor-temp/assets/js/browser.min.js"></script>
+	<script src="../editor-temp/assets/js/breakpoints.min.js"></script>
+	<script src="../editor-temp/assets/js/util.js"></script>
+	<script src="../editor-temp/assets/js/main.js"></script>
+
+	<!-- 側邊欄切換功能 -->
+	<script>
+		$(document).ready(function() {
+			// 綁定切換按鈕點擊事件
+			$('.sidebar-toggle').on('click', function(e) {
+				e.preventDefault();
+				e.stopPropagation();
+
+				// 切換側邊欄的 inactive 類
+				$('#sidebar').toggleClass('inactive');
+
+				// 切換 body 的類（用於內容區域調整）
+				$('body').toggleClass('sidebar-inactive');
+			});
+		});
+	</script>
+
+</body>
+</html>
