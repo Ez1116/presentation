@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>天文學演變：火星逆行與金星相位</title>
+    <style>
+        :root {
+            --bg-color: #050505;
+            --panel-color: #1a1a1a;
+            --accent-color: #4cc9f0;
+            --mars-color: #ff4d4d;
+            --venus-color: #f2d280; /* 金星淡金色 */
+            --retro-color: #00ff88;
+            --earth-color: #4d79ff;
+            --sun-color: #ffd700;
+            --text-color: #e0e0e0;
+        }
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+        h1 { margin-bottom: 5px; font-weight: 300; letter-spacing: 1px; }
+        .subtitle { color: #888; margin-bottom: 20px; font-size: 0.9rem; }
+
+        /* Control Group Container */
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 20px;
+            background: var(--panel-color);
+            padding: 15px;
+            border-radius: 16px;
+            border: 1px solid #333;
+        }
+        .group-label { font-size: 0.8rem; color: #666; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; }
+
+        /* Tabs */
+        .tabs { display: flex; gap: 5px; }
+        .tab-btn {
+            background: transparent;
+            border: 1px solid #444;
+            color: #888;
+            padding: 8px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+        }
+        .tab-btn.active {
+            background: var(--accent-color);
+            color: #000;
+            border-color: var(--accent-color);
+            font-weight: bold;
+        }
+        .tab-btn.planet-active {
+            background: #fff;
+            color: #000;
+            border-color: #fff;
+            font-weight: bold;
+        }
+        .tab-btn:hover:not(.active):not(.planet-active) { border-color: #888; color: #fff; }
+
+        /* Canvas Container */
+        .canvas-container {
+            position: relative;
+            box-shadow: 0 0 30px rgba(0,0,0,0.8);
+            border-radius: 12px;
+            overflow: hidden;
+            background: #0e0e12;
+            margin-bottom: 10px;
+        }
+        canvas { display: block; }
+        
+        /* Info Panel (Below Canvas) */
+        .info-panel {
+            background: var(--panel-color);
+            padding: 20px;
+            border-radius: 12px;
+            max-width: 800px;
+            width: 100%;
+            border: 1px solid #333;
+            border-left: 4px solid var(--accent-color);
+            margin-top: 15px;
+            margin-bottom: 15px;
+        }
+        .info-title { font-weight: bold; color: #fff; margin-bottom: 8px; font-size: 1rem; }
+        .info-desc { font-size: 0.85rem; color: #ccc; line-height: 1.5; }
+        
+        /* Phase/Elongation Indicator for Venus */
+        .status-indicator {
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid #444;
+            font-size: 0.8rem;
+            color: var(--venus-color);
+            display: none; /* Hidden by default */
+        }
+
+        /* Legend */
+        .legend {
+            margin-top: 5px;
+            display: flex;
+            gap: 20px;
+            font-size: 0.85rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; margin-right: 5px; vertical-align: middle; }
+
+        /* Controls */
+        .controls {
+            margin-top: 15px;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+        button.ctrl-btn {
+            padding: 8px 16px;
+            background: #333;
+            border: 1px solid #555;
+            color: white;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button.ctrl-btn:hover { background: #444; }
+        input[type="range"] { accent-color: var(--accent-color); }
+
+    </style>
+</head>
+<body>
+
+    <h1>天文學演變史</h1>
+    <div class="subtitle">從地心說限制到日心說解放：火星逆行與金星相位</div>
+
+    <div class="control-group">
+        <div>
+            <span class="group-label">觀測目標:</span>
+            <div class="tabs">
+                <button class="tab-btn planet-active" onclick="setPlanet('mars', this)">火星 (Mars)</button>
+                <button class="tab-btn" onclick="setPlanet('venus', this)">金星 (Venus)</button>
+            </div>
+        </div>
+        
+        <div style="margin-top:10px;">
+            <span class="group-label">宇宙模型:</span>
+            <div class="tabs">
+                <button class="tab-btn active" onclick="setMode('geocentric', this)">1. 地心說 (Ptolemaic)</button>
+                <button class="tab-btn" onclick="setMode('heliocentric', this)">2. 日心說 (Copernican)</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="canvas-container">
+        <canvas id="mainCanvas" width="800" height="500"></canvas>
+    </div>
+
+    <div class="info-panel" id="infoPanel">
+        <div class="info-title" id="infoTitle">標題</div>
+        <div class="info-desc" id="infoDesc">說明</div>
+        <div class="status-indicator" id="statusInd"></div>
+    </div>
+
+    <div class="legend" id="legend"></div>
+
+    <div class="controls">
+        <button class="ctrl-btn" onclick="togglePause()">暫停/開始</button>
+        <button class="ctrl-btn" onclick="resetSim()">重置</button>
+        <label>演變速度: <input type="range" id="speedRange" min="0" max="4" step="0.1" value="1.0"></label>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('mainCanvas');
+        const ctx = canvas.getContext('2d');
+        const width = canvas.width;
+        const height = canvas.height;
+        const cx = width / 2;
+        const cy = height / 2;
+
+        // State
+        let currentPlanet = 'mars'; // 'mars' or 'venus'
+        let currentMode = 'geocentric'; // 'geocentric' or 'heliocentric'
+        let isPaused = false;
+        let speedMultiplier = 1.0;
+        let t = 0;
+        let trail = [];
+
+        // DOM Elements
+        const infoTitle = document.getElementById('infoTitle');
+        const infoDesc = document.getElementById('infoDesc');
+        const statusInd = document.getElementById('statusInd');
+        const legend = document.getElementById('legend');
+
+        // Colors
+        const COLORS = {
+            earth: '#4d79ff',
+            sun: '#ffd700',
+            mars: '#ff4d4d',
+            venus: '#f2d280',
+            retro: '#00ff88',
+            orbit: '#333',
+            line: '#555'
+        };
+
+        // Text Configuration
+        const TEXTS = {
+            mars: {
+                geocentric: {
+                    title: "火星：地心說 (本輪機制)",
+                    desc: "托勒密模型解釋逆行：火星在較小的「本輪」上運行，本輪中心沿著「均輪」繞地球運行。當火星在本輪內側逆向移動時，從地球看就像在倒退。",
+                    legend: `<span style="color:${COLORS.earth}">● 地球</span> <span style="margin-left:10px"><span class="dot" style="background:${COLORS.mars}"></span>火星</span> <span style="margin-left:10px"><span class="dot" style="background:${COLORS.retro}"></span>逆行軌跡</span>`
+                },
+                heliocentric: {
+                    title: "火星：日心說 (軌道超車)",
+                    desc: "哥白尼模型解釋逆行：地球（內圈，藍）公轉速度比火星（外圈，紅）快。當地球在內側軌道「超車」火星時，視覺上火星會暫時後退。",
+                    legend: `<span style="color:${COLORS.sun}">● 太陽</span> <span style="color:${COLORS.earth}">● 地球</span> <span style="color:${COLORS.mars}">● 火星</span> <span style="margin-left:10px"><span class="dot" style="background:${COLORS.retro}"></span>逆行軌跡</span>`
+                }
+            },
+            venus: {
+                geocentric: {
+                    title: "金星：地心說 (永遠的眉月)",
+                    desc: "在托勒密模型中，金星本輪中心被鎖定在太陽方向，且**本輪半徑受限**（必須小於地球-太陽距離），確保金星**永遠無法運行到太陽背面**。因此從地球看，金星只能呈現新月到半月狀態，**絕對不可能出現凸月或滿月**。這是地心說的理論要求。",
+                    legend: `<span style="color:${COLORS.earth}">● 地球</span> <span style="color:${COLORS.sun}">● 太陽</span> <span style="color:${COLORS.venus}">● 金星</span>`
+                },
+                heliocentric: {
+                    title: "金星：日心說 (完整的盈虧與大距)",
+                    desc: "伽利略的關鍵證據：金星繞行太陽。當金星在太陽對面時（遠），呈現**滿月且小**；當金星在地球同側時（近），呈現**新月且大**。當金星與太陽的角距離達到最大（**大距**）時，金星最適合觀測：<strong style='color:#a855f7'>西大距</strong>（晨星，黎明前）或<strong style='color:#ff6b35'>東大距</strong>（昏星，黃昏後）。",
+                    legend: `<span style="color:${COLORS.sun}">● 太陽</span> <span style="color:${COLORS.earth}">● 地球</span> <span style="color:${COLORS.venus}">● 金星</span>`
+                }
+            }
+        };
+
+        // Initialize
+        updateUI();
+        animate();
+
+        // --- UI Controls ---
+        function setPlanet(planet, btn) {
+            currentPlanet = planet;
+            // Update buttons visual state
+            document.querySelectorAll('.tab-btn.planet-active').forEach(b => b.classList.remove('planet-active'));
+            btn.classList.add('planet-active');
+            resetSim();
+            updateUI();
+        }
+
+        function setMode(mode, btn) {
+            currentMode = mode;
+            // Update buttons visual state
+            const modeBtns = btn.parentElement.querySelectorAll('.tab-btn');
+            modeBtns.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            resetSim();
+            updateUI();
+        }
+
+        function updateUI() {
+            const data = TEXTS[currentPlanet][currentMode];
+            infoTitle.innerText = data.title;
+            infoDesc.innerHTML = data.desc;
+            legend.innerHTML = data.legend;
+            
+            if (currentPlanet === 'venus') {
+                statusInd.style.display = 'block';
+            } else {
+                statusInd.style.display = 'none';
+            }
+        }
+
+        function togglePause() { isPaused = !isPaused; }
+        function resetSim() { t = 0; trail = []; }
+        
+        document.getElementById('speedRange').addEventListener('input', (e) => {
+            speedMultiplier = parseFloat(e.target.value);
+        });
+
+        // --- Main Loop ---
+        function animate() {
+            requestAnimationFrame(animate);
+            
+            if(!isPaused) {
+                t += 0.01 * speedMultiplier;
+            }
+
+            // Clear & Background
+            ctx.fillStyle = '#050505';
+            ctx.fillRect(0, 0, width, height);
+            drawStars();
+
+            // Dispatcher
+            if (currentPlanet === 'mars') {
+                if (currentMode === 'geocentric') drawGeoMars();
+                else drawHelioMars();
+            } else {
+                if (currentMode === 'geocentric') drawGeoVenus();
+                else drawHelioVenus();
+            }
+        }
+
+        // ==========================================
+        // SCENARIO 1: MARS GEOCENTRIC (Keep Trails)
+        // ==========================================
+        function drawGeoMars() {
+            const earthX = cx, earthY = cy;
+            const defRadius = 120, defSpeed = 0.5;
+            const epiRadius = 40, epiSpeed = 2.0;
+            
+            const defAngle = -t * defSpeed;
+            const epiCenterX = earthX + Math.cos(defAngle) * defRadius;
+            const epiCenterY = earthY + Math.sin(defAngle) * defRadius;
+
+            const epiAngle = -t * epiSpeed;
+            const marsX = epiCenterX + Math.cos(epiAngle) * epiRadius;
+            const marsY = epiCenterY + Math.sin(epiAngle) * epiRadius;
+
+            drawSystemWithTrail(earthX, earthY, epiCenterX, epiCenterY, marsX, marsY, COLORS.mars, defRadius, epiRadius);
+        }
+
+        // ==========================================
+        // SCENARIO 2: MARS HELIOCENTRIC (Keep Trails)
+        // ==========================================
+        function drawHelioMars() {
+            const eSpeed = 2.0, mSpeed = 1.0;
+            const eR = 50, mR = 90;
+            const eAng = -t * eSpeed - 2.0; 
+            const mAng = -t * mSpeed;
+
+            drawHeliocentricView(eAng, eR, mAng, mR, COLORS.mars, "火星", true);
+        }
+
+        // ==========================================
+        // SCENARIO 3: VENUS GEOCENTRIC (Phase Focus)
+        // ==========================================
+        function drawGeoVenus() {
+            const earthX = cx - 150, earthY = cy; // Shift main diagram left
+            
+            // 地心說金星：太陽繞地，金星本輪中心鎖定在太陽方向
+            const sunOrbitR = 180;
+            const sunSpeed = 0.8;
+            const sunAngle = -t * sunSpeed;
+
+            const sunX = earthX + Math.cos(sunAngle) * sunOrbitR;
+            const sunY = earthY + Math.sin(sunAngle) * sunOrbitR;
+
+            const defRadius = 110; // 本輪中心軌道
+            const epiCenterAngle = sunAngle; // Locked
+            const epiCenterX = earthX + Math.cos(epiCenterAngle) * defRadius;
+            const epiCenterY = earthY + Math.sin(epiCenterAngle) * defRadius;
+
+            const epiRadius = 45;
+            const epiSpeed = 2.5;
+            const epiAngle = -t * epiSpeed; // 完整圓周運動
+
+            const venusX = epiCenterX + Math.cos(epiAngle) * epiRadius;
+            const venusY = epiCenterY + Math.sin(epiAngle) * epiRadius;
+
+            // 繪圖 - 軌道
+            ctx.strokeStyle = '#333';
+            ctx.beginPath(); ctx.arc(earthX, earthY, defRadius, 0, Math.PI*2); ctx.stroke(); // Deferent
+            ctx.strokeStyle = '#444';
+            ctx.beginPath(); ctx.arc(epiCenterX, epiCenterY, epiRadius, 0, Math.PI*2); ctx.stroke(); // Epicycle
+
+            // 連線 (Arm)
+            ctx.strokeStyle = '#555';
+            ctx.beginPath(); ctx.moveTo(epiCenterX, epiCenterY); ctx.lineTo(venusX, venusY); ctx.stroke();
+
+            // 太陽虛線
+            ctx.strokeStyle = 'rgba(255, 215, 0, 0.3)'; ctx.setLineDash([5,5]);
+            ctx.beginPath(); ctx.moveTo(earthX, earthY); ctx.lineTo(sunX, sunY); ctx.stroke(); ctx.setLineDash([]);
+            
+            // 天體
+            drawBody(earthX, earthY, 10, COLORS.earth, "地球");
+            drawBody(sunX, sunY, 12, COLORS.sun, "太陽");
+            
+            // 金星 (簡單點)
+            ctx.fillStyle = COLORS.venus;
+            ctx.beginPath(); ctx.arc(venusX, venusY, 6, 0, Math.PI*2); ctx.fill();
+
+            // 計算相位 (Angle between Vector(Venus->Sun) and Vector(Venus->Earth))
+            // Vector Venus->Sun
+            const vx_s = sunX - venusX;
+            const vy_s = sunY - venusY;
+            // Vector Venus->Earth
+            const vx_e = earthX - venusX;
+            const vy_e = earthY - venusY;
+
+            const angleSun = Math.atan2(vy_s, vx_s);
+            const angleEarth = Math.atan2(vy_e, vx_e);
+            
+            let diff = Math.abs(angleSun - angleEarth);
+            while(diff > Math.PI) diff = 2*Math.PI - diff;
+            const phaseRatio = 1 - (diff / Math.PI); // 0=New, 1=Full (反轉修正)
+
+            // 在地心說模型，金星總是在太陽附近，無法繞到對面
+            // 所以 Phase 永遠不大於 0.5 (左右)，總是呈現眉月
+
+            // 計算從地球看金星相對於太陽的角度（判斷金星在太陽的哪一邊）
+            // 金星在太陽左邊（東大距）→ 亮部在右邊
+            // 金星在太陽右邊（西大距）→ 亮部在左邊
+            const angleEarthToSun = Math.atan2(sunY - earthY, sunX - earthX);
+            const angleEarthToVenus = Math.atan2(venusY - earthY, venusX - earthX);
+            const venusRelativeToSun = angleEarthToVenus - angleEarthToSun;
+
+            // 繪製「望遠鏡視野」(Phase View) - 位於右側
+            drawTelescopeView(600, cy, 100, phaseRatio, "模擬望遠鏡視野 (地心說)", true, venusRelativeToSun);
+
+            statusInd.innerHTML = `預測相位: <span style="color:#fff">新月到半月 (不超過50%)</span><br>說明: 本輪半徑限制使金星無法跑到太陽背面，因此只能呈現新月到半月狀態。`;
+        }
+
+        // ==========================================
+        // SCENARIO 4: VENUS HELIOCENTRIC (Phase Focus)
+        // ==========================================
+        function drawHelioVenus() {
+            const eSpeed = 1.0;
+            const vSpeed = 1.62;
+            const eR = 90;
+            const vR = 66;  // 調整為 66 以達到最大距角 ~47°
+
+            const eAng = -t * eSpeed - 1.5;
+            const vAng = -t * vSpeed;
+
+            // Left View: Top Down Map
+            const leftCX = 200, leftCY = 250;
+            const exL = leftCX + Math.cos(eAng) * eR;
+            const eyL = leftCY + Math.sin(eAng) * eR;
+            const vxL = leftCX + Math.cos(vAng) * vR;
+            const vyL = leftCY + Math.sin(vAng) * vR;
+
+            drawSolarSystemBase(leftCX, leftCY, exL, eyL, vxL, vyL, eR, vR, COLORS.venus);
+
+            // Calculate Phase
+            // Angle Earth-Sun-Venus for geometric phase calculation?
+            // Correct physical phase is Angle Sun-Venus-Earth.
+            // Sun is at (leftCX, leftCY)
+            
+            const sunX = leftCX, sunY = leftCY;
+            const vecVS_x = sunX - vxL;
+            const vecVS_y = sunY - vyL;
+            const vecVE_x = exL - vxL;
+            const vecVE_y = eyL - vyL;
+
+            const angSun = Math.atan2(vecVS_y, vecVS_x);
+            const angEarth = Math.atan2(vecVE_y, vecVE_x);
+            
+            let diff = Math.abs(angSun - angEarth);
+            while(diff > Math.PI) diff = 2*Math.PI - diff;
+            const phaseRatio = 1 - (diff / Math.PI); // 0=New, 1=Full (反轉修正)
+
+            // Calculate Distance for Visual Size
+            const dist = Math.hypot(vecVE_x, vecVE_y); // Distance Earth-Venus
+            // Min dist approx 24 (90-66), Max dist 156 (90+66)
+            // Scale size: Close=Big, Far=Small.
+            // Let's say radius ranges from 80px (close) to 15px (far)
+            const minD = 24, maxD = 156;
+            const sizeFactor = 1 - (dist - minD)/(maxD - minD); // 1.0 (close) to 0.0 (far)
+            const visualRadius = 20 + (sizeFactor * 80);
+
+            // 計算從地球看金星相對於太陽的角度（判斷金星在太陽的哪一邊）
+            // 金星在太陽左邊（東大距，昏星）→ 亮部在右邊
+            // 金星在太陽右邊（西大距，晨星）→ 亮部在左邊
+            const angleEarthToSun = Math.atan2(sunY - eyL, sunX - exL);
+            const angleEarthToVenus = Math.atan2(vyL - eyL, vxL - exL);
+            const venusRelativeToSun = angleEarthToVenus - angleEarthToSun;
+
+            // 計算大距(Elongation)角度
+            let elongationAngle = Math.abs(venusRelativeToSun);
+            while (elongationAngle > Math.PI) elongationAngle = 2*Math.PI - elongationAngle;
+            const elongationDegrees = elongationAngle * 180 / Math.PI;
+
+            // 判斷是否處於大距狀態(接近最大距角,約40-50度)
+            const isAtElongation = elongationDegrees > 35 && elongationDegrees < 55;
+            let elongationType = null;
+            if (isAtElongation) {
+                // 判斷西大距或東大距
+                let normAngle = venusRelativeToSun;
+                while (normAngle > Math.PI) normAngle -= 2 * Math.PI;
+                while (normAngle < -Math.PI) normAngle += 2 * Math.PI;
+                elongationType = normAngle < 0 ? 'eastern' : 'western'; // 東大距 or 西大距
+            }
+
+            // 繪製大距特效(如果處於大距狀態)
+            if (isAtElongation) {
+                drawElongationEffect(leftCX, leftCY, exL, eyL, vxL, vyL, elongationType, elongationDegrees);
+            }
+
+            // Right View: Telescope View (Replacing the "Map")
+            drawTelescopeView(580, 250, visualRadius, phaseRatio, "實際觀測視野 (日心說)", false, venusRelativeToSun);
+
+            // Phase Text
+            let phaseName = "";
+            if (phaseRatio > 0.95) phaseName = "滿月 (Full)";
+            else if (phaseRatio < 0.05) phaseName = "新月 (New)";
+            else if (phaseRatio >= 0.5) phaseName = "凸月 (Gibbous)";
+            else phaseName = "眉月 (Crescent)";
+
+            // 大距狀態顯示
+            let elongationStatus = "";
+            if (isAtElongation) {
+                const elongColor = elongationType === 'eastern' ? '#ff6b35' : '#a855f7';
+                const elongName = elongationType === 'eastern' ? '東大距' : '西大距';
+                const timeOfDay = elongationType === 'eastern' ? '黃昏後西方天空' : '黎明前東方天空';
+                const starName = elongationType === 'eastern' ? '昏星/長庚星' : '晨星/啟明星';
+
+                elongationStatus = `
+                    <strong style="color:${elongColor}">⭐ ${elongName}狀態</strong><br>
+                    角距離: <span style="color:${elongColor}">${elongationDegrees.toFixed(1)}°</span> (最大約47°)<br>
+                    可見時間: <span style="color:#fff">${timeOfDay}</span><br>
+                    別稱: <span style="color:${elongColor}">${starName}</span><br>
+                `;
+            }
+
+            statusInd.innerHTML = `
+                ${elongationStatus}
+                相位: <span style="color:#fff">${phaseName}</span><br>
+                視直徑: <span style="color:${sizeFactor > 0.8 ? COLORS.retro : '#fff'}">${sizeFactor > 0.7 ? "極大 (近地)" : sizeFactor < 0.3 ? "極小 (遠地)" : "中等"}</span><br>
+                證據: <span style="color:#aaa">距離遠時變圓，距離近時變缺。</span>
+            `;
+        }
+
+        // --- Helper: Draw Telescope View (The Phase Visualizer) ---
+        function drawTelescopeView(x, y, radius, phase, label, isGeo, venusRelativeToSun = 0) {
+            // Box
+            ctx.strokeStyle = '#333';
+            ctx.strokeRect(x - 150, y - 150, 300, 300);
+            ctx.fillStyle = '#111';
+            ctx.fillRect(x - 149, y - 149, 298, 298);
+
+            // Label
+            ctx.fillStyle = '#aaa';
+            ctx.textAlign = 'center';
+            ctx.font = '14px Arial';
+            ctx.fillText(label, x, y + 130);
+
+            // Determine illumination direction based on Venus position relative to Sun
+            // 左右相反原則：金星在太陽的哪一邊，亮部就在相反的那一邊
+            // Normalize angle to [-π, π]
+            let normAngle = venusRelativeToSun;
+            while (normAngle > Math.PI) normAngle -= 2 * Math.PI;
+            while (normAngle < -Math.PI) normAngle += 2 * Math.PI;
+
+            // 金星在太陽左邊（東大距，昏星/長庚星）→ normAngle < 0 → 亮部在右邊
+            // 金星在太陽右邊（西大距，晨星/啟明星）→ normAngle > 0 → 亮部在左邊
+            const sunOnRight = (normAngle < 0);
+
+            // Save canvas state
+            ctx.save();
+
+            // Move to Venus center
+            ctx.translate(x, y);
+
+            // If sun is on the left, flip horizontally to create "left-lit" phase
+            if (!sunOnRight) {
+                ctx.scale(-1, 1);
+            }
+
+            // Draw phase using standard "right-lit" logic (centered at origin)
+            // 1. Shadow Base
+            ctx.fillStyle = '#000'; // Dark
+            ctx.beginPath(); ctx.arc(0, 0, radius, 0, Math.PI*2); ctx.fill();
+
+            // 2. Light Source from Right (in local coordinates)
+            // Phase 0 = New (All Dark). Phase 1 = Full (All Light).
+            if (phase > 0.02) {
+                ctx.fillStyle = COLORS.venus;
+
+                // Draw Right Semi-Circle (Always Lit unless New)
+                ctx.beginPath();
+                ctx.arc(0, 0, radius, -Math.PI/2, Math.PI/2);
+                ctx.fill();
+
+                // Draw Ellipse to handle the Terminator line
+                // phase 0.5 -> width 0 (half moon)
+                // phase 0 -> width -radius (new moon)
+                // phase 1 -> width +radius (full moon)
+                const w = (phase - 0.5) * 2 * radius;
+
+                ctx.beginPath();
+                ctx.ellipse(0, 0, Math.abs(w), radius, 0, 0, Math.PI*2);
+
+                if (phase < 0.5) {
+                    // Crescent: The ellipse is DARK, cutting into the light semi-circle
+                    ctx.fillStyle = '#111'; // Match background
+                    ctx.fill();
+                } else {
+                    // Gibbous: The ellipse is LIGHT, adding to the light semi-circle
+                    ctx.fillStyle = COLORS.venus;
+                    ctx.fill();
+                }
+            }
+
+            // Restore canvas state
+            ctx.restore();
+
+            // Glow effect (in original coordinate system)
+            if (phase > 0) {
+                ctx.shadowBlur = 20;
+                ctx.shadowColor = COLORS.venus;
+                ctx.strokeStyle = 'rgba(242, 210, 128, 0.5)';
+                ctx.lineWidth = 2;
+                ctx.beginPath(); ctx.arc(x, y, radius, 0, Math.PI*2); ctx.stroke();
+                ctx.shadowBlur = 0;
+                ctx.lineWidth = 1;
+            }
+        }
+
+
+        // --- Helper Functions ---
+
+        // 繪製大距特效
+        function drawElongationEffect(sunX, sunY, earthX, earthY, venusX, venusY, type, angleDeg) {
+            const color = type === 'eastern' ? '#ff6b35' : '#a855f7'; // 東大距橙色, 西大距紫色
+            const label = type === 'eastern' ? '東大距 (昏星)' : '西大距 (晨星)';
+
+            // 1. 繪製連線高亮 (地球->太陽, 地球->金星)
+            ctx.save();
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 2;
+            ctx.globalAlpha = 0.6;
+            ctx.setLineDash([5, 3]);
+
+            // 地球->太陽
+            ctx.beginPath();
+            ctx.moveTo(earthX, earthY);
+            ctx.lineTo(sunX, sunY);
+            ctx.stroke();
+
+            // 地球->金星
+            ctx.beginPath();
+            ctx.moveTo(earthX, earthY);
+            ctx.lineTo(venusX, venusY);
+            ctx.stroke();
+
+            ctx.setLineDash([]);
+            ctx.restore();
+
+            // 2. 繪製角度弧線
+            const arcRadius = 40;
+            const angleToSun = Math.atan2(sunY - earthY, sunX - earthX);
+            const angleToVenus = Math.atan2(venusY - earthY, venusX - earthX);
+
+            // 計算角度差異並正規化到 [-π, π] 範圍
+            let angleDiff = angleToVenus - angleToSun;
+            while (angleDiff > Math.PI) angleDiff -= 2 * Math.PI;
+            while (angleDiff < -Math.PI) angleDiff += 2 * Math.PI;
+
+            // 根據正規化後的差異決定弧線方向（永遠畫短弧）
+            const counterClockwise = angleDiff < 0;
+
+            ctx.save();
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 2.5;
+            ctx.globalAlpha = 0.8;
+            ctx.beginPath();
+            ctx.arc(earthX, earthY, arcRadius, angleToSun, angleToVenus, counterClockwise);
+            ctx.stroke();
+            ctx.restore();
+
+            // 3. 金星周圍的脈動光環
+            const pulseSize = Math.sin(t * 3) * 3 + 8;
+            ctx.save();
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 3;
+            ctx.globalAlpha = 0.7 + Math.sin(t * 3) * 0.3;
+            ctx.beginPath();
+            ctx.arc(venusX, venusY, pulseSize, 0, Math.PI * 2);
+            ctx.stroke();
+            ctx.restore();
+
+            // 4. 繪製標註文字
+            ctx.save();
+            ctx.fillStyle = color;
+            ctx.font = 'bold 13px Arial';
+            ctx.textAlign = 'center';
+            ctx.shadowBlur = 8;
+            ctx.shadowColor = color;
+            ctx.fillText(label, venusX, venusY - 20);
+            ctx.font = '11px Arial';
+            ctx.fillText(`${angleDeg.toFixed(1)}°`, venusX, venusY - 5);
+            ctx.restore();
+        }
+
+        function drawBody(x, y, r, color, label) {
+            ctx.fillStyle = color;
+            ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI*2); ctx.fill();
+            if(label) {
+                ctx.fillStyle = '#fff'; ctx.font = '12px Arial'; ctx.fillText(label, x - 10, y + r + 15);
+            }
+        }
+
+        // Keep Trail logic only for Mars
+        function drawSystemWithTrail(cX, cY, epiCX, epiCY, pX, pY, color, rDef, rEpi) {
+            drawBody(cX, cY, 10, COLORS.earth, "地球");
+
+            ctx.strokeStyle = '#333';
+            ctx.beginPath(); ctx.arc(cX, cY, rDef, 0, Math.PI*2); ctx.stroke();
+
+            ctx.strokeStyle = '#444';
+            ctx.beginPath(); ctx.arc(epiCX, epiCY, rEpi, 0, Math.PI*2); ctx.stroke();
+
+            ctx.strokeStyle = '#555';
+            ctx.beginPath(); ctx.moveTo(epiCX, epiCY); ctx.lineTo(pX, pY); ctx.stroke();
+
+            // Trail Logic
+            let isRetro = false;
+            if (trail.length > 0) {
+                const prev = trail[trail.length - 1];
+                const currAng = Math.atan2(pY - cY, pX - cX);
+                const prevAng = Math.atan2(prev.y - cY, prev.x - cX);
+                let dAng = currAng - prevAng;
+                if (dAng > Math.PI) dAng -= 2 * Math.PI;
+                if (dAng < -Math.PI) dAng += 2 * Math.PI;
+                if (dAng > 0) isRetro = true; 
+            }
+
+            trail.push({x: pX, y: pY, isRetro});
+            if(trail.length > 600) trail.shift();
+            drawTrail(color);
+
+            ctx.fillStyle = isRetro ? COLORS.retro : color;
+            ctx.beginPath(); ctx.arc(pX, pY, 6, 0, Math.PI*2); ctx.fill();
+
+            ctx.strokeStyle = 'rgba(255,255,255,0.1)';
+            ctx.setLineDash([5,5]);
+            ctx.beginPath(); ctx.moveTo(cX, cY);
+            const angle = Math.atan2(pY - cY, pX - cX);
+            ctx.lineTo(cX + Math.cos(angle)*1000, cY + Math.sin(angle)*1000);
+            ctx.stroke();
+            ctx.setLineDash([]);
+        }
+
+        function drawHeliocentricView(eAng, eR, pAng, pR, pColor, pName, showTrail) {
+            const leftCX = 160, leftCY = 250;
+            const exL = leftCX + Math.cos(eAng) * eR;
+            const eyL = leftCY + Math.sin(eAng) * eR;
+            const pxL = leftCX + Math.cos(pAng) * pR;
+            const pyL = leftCY + Math.sin(pAng) * pR;
+
+            drawSolarSystemBase(leftCX, leftCY, exL, eyL, pxL, pyL, eR, pR, pColor);
+
+            // Right View (Position Map) for Mars
+            const rightCX = 560, rightCY = 250;
+            const relX = pxL - exL;
+            const relY = pyL - eyL;
+            const pxR = rightCX + relX;
+            const pyR = rightCY + relY;
+
+            ctx.fillStyle = '#aaa'; ctx.textAlign = 'center'; ctx.fillText('從地球觀察 (軌跡)', rightCX, 480);
+            drawBody(rightCX, rightCY, 10, COLORS.earth, "地球");
+
+            if (showTrail) {
+                let isRetro = false;
+                if (trail.length > 0) {
+                    const prev = trail[trail.length - 1];
+                    const currAng = Math.atan2(pyR - rightCY, pxR - rightCX);
+                    const prevAng = Math.atan2(prev.y - rightCY, prev.x - rightCX);
+                    let dAng = currAng - prevAng;
+                    if (dAng > Math.PI) dAng -= 2 * Math.PI;
+                    if (dAng < -Math.PI) dAng += 2 * Math.PI;
+                    if (dAng > 0) isRetro = true;
+                }
+                trail.push({x: pxR, y: pyR, isRetro});
+                if (trail.length > 800) trail.shift();
+                drawTrail(pColor);
+            }
+
+            ctx.fillStyle = pColor;
+            ctx.beginPath(); ctx.arc(pxR, pyR, 8, 0, Math.PI*2); ctx.fill();
+        }
+
+        function drawSolarSystemBase(cx, cy, ex, ey, px, py, er, pr, pColor) {
+            ctx.strokeStyle = '#333'; ctx.lineWidth = 2;
+            ctx.beginPath(); ctx.moveTo(380, 0); ctx.lineTo(380, height); ctx.stroke(); ctx.lineWidth = 1;
+            
+            ctx.fillStyle = '#aaa'; ctx.textAlign = 'center'; ctx.fillText('太陽系俯視圖', cx, 480);
+
+            ctx.strokeStyle = '#333';
+            ctx.beginPath(); ctx.arc(cx, cy, er, 0, Math.PI*2); ctx.stroke(); 
+            ctx.beginPath(); ctx.arc(cx, cy, pr, 0, Math.PI*2); ctx.stroke(); 
+
+            ctx.fillStyle = COLORS.sun;
+            ctx.shadowBlur = 20; ctx.shadowColor = COLORS.sun;
+            ctx.beginPath(); ctx.arc(cx, cy, 12, 0, Math.PI*2); ctx.fill();
+            ctx.shadowBlur = 0;
+
+            ctx.strokeStyle = 'rgba(255,255,255,0.3)'; ctx.setLineDash([3, 3]);
+            ctx.beginPath(); ctx.moveTo(ex, ey); ctx.lineTo(px, py); ctx.stroke(); ctx.setLineDash([]);
+
+            ctx.fillStyle = COLORS.earth;
+            ctx.beginPath(); ctx.arc(ex, ey, 8, 0, Math.PI*2); ctx.fill();
+
+            ctx.fillStyle = pColor;
+            ctx.beginPath(); ctx.arc(px, py, 7, 0, Math.PI*2); ctx.fill();
+        }
+
+        function drawStars() {
+            ctx.fillStyle = '#fff';
+            for(let i=0; i<50; i++) {
+                const sx = (Math.sin(i*123) * width + width) % width;
+                const sy = (Math.cos(i*321) * height + height) % height;
+                ctx.globalAlpha = Math.random() * 0.5 + 0.2;
+                ctx.fillRect(sx, sy, 1.5, 1.5);
+            }
+            ctx.globalAlpha = 1.0;
+        }
+
+        function drawTrail(defaultColor) {
+            if (trail.length < 2) return;
+            ctx.lineWidth = 3; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+            
+            for (let i = 0; i < trail.length - 1; i++) {
+                const p1 = trail[i];
+                const p2 = trail[i+1];
+                const dist = Math.hypot(p1.x - p2.x, p1.y - p2.y);
+                
+                if(dist < 100) { 
+                    ctx.beginPath();
+                    ctx.strokeStyle = p2.isRetro ? COLORS.retro : defaultColor;
+                    ctx.moveTo(p1.x, p1.y);
+                    ctx.lineTo(p2.x, p2.y);
+                    ctx.stroke();
+                }
+            }
+            ctx.lineWidth = 1;
+        }
+
+    </script>
+</body>
+</html>
